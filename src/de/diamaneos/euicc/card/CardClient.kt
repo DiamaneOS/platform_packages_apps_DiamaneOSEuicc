@@ -8,6 +8,8 @@ import android.service.euicc.EuiccProfileInfo
 import android.telephony.TelephonyManager
 import android.telephony.UiccSlotInfo
 import android.telephony.euicc.EuiccCardManager
+import android.telephony.euicc.EuiccNotification
+import android.telephony.euicc.EuiccRulesAuthTable
 import android.util.Log
 import de.diamaneos.euicc.core.ProfileList
 import de.diamaneos.euicc.core.RawProfile
@@ -86,6 +88,58 @@ class CardClient(context: Context) {
     fun resetMemory(euicc: Euicc, options: Int): Int =
         call<Void>(WRITE_TIMEOUT_S) { m, cb -> m.resetMemory(euicc.cardId, options, DIRECT, cb) }.code
 
+    // ES10b for downloads and notifications (SGP.22 5.7). The framework builds the commands,
+    // segments the Bound Profile Package and returns the eUICC's responses whole.
+
+    fun euiccInfo1(euicc: Euicc): CardResult<ByteArray> =
+        call(READ_TIMEOUT_S) { m, cb -> m.requestEuiccInfo1(euicc.cardId, DIRECT, cb) }
+
+    fun euiccChallenge(euicc: Euicc): CardResult<ByteArray> =
+        call(READ_TIMEOUT_S) { m, cb -> m.requestEuiccChallenge(euicc.cardId, DIRECT, cb) }
+
+    /** The framework adds ctxParams1: [matchingId] and DeviceInfo (TAC, capabilities, IMEI). */
+    fun authenticateServer(
+        euicc: Euicc,
+        matchingId: String,
+        serverSigned1: ByteArray,
+        serverSignature1: ByteArray,
+        euiccCiPkIdToBeUsed: ByteArray,
+        serverCertificate: ByteArray,
+    ): CardResult<ByteArray> = call(READ_TIMEOUT_S) { m, cb ->
+        m.authenticateServer(euicc.cardId, matchingId, serverSigned1, serverSignature1,
+            euiccCiPkIdToBeUsed, serverCertificate, DIRECT, cb)
+    }
+
+    fun prepareDownload(
+        euicc: Euicc,
+        hashCc: ByteArray?,
+        smdpSigned2: ByteArray,
+        smdpSignature2: ByteArray,
+        smdpCertificate: ByteArray,
+    ): CardResult<ByteArray> = call(READ_TIMEOUT_S) { m, cb ->
+        m.prepareDownload(euicc.cardId, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, DIRECT, cb)
+    }
+
+    fun loadBoundProfilePackage(euicc: Euicc, bpp: ByteArray): CardResult<ByteArray> =
+        call(INSTALL_TIMEOUT_S) { m, cb -> m.loadBoundProfilePackage(euicc.cardId, bpp, DIRECT, cb) }
+
+    fun cancelSession(euicc: Euicc, transactionId: ByteArray, reason: Int): CardResult<ByteArray> =
+        call(READ_TIMEOUT_S) { m, cb -> m.cancelSession(euicc.cardId, transactionId, reason, DIRECT, cb) }
+
+    /** RetrieveNotificationsList: each notification's data is the whole PendingNotification. */
+    fun retrieveNotifications(euicc: Euicc, events: Int): CardResult<Array<EuiccNotification?>> =
+        call(READ_TIMEOUT_S) { m, cb -> m.retrieveNotificationList(euicc.cardId, events, DIRECT, cb) }
+
+    fun removeNotification(euicc: Euicc, seq: Int): Int =
+        call<Void>(READ_TIMEOUT_S) { m, cb -> m.removeNotificationFromList(euicc.cardId, seq, DIRECT, cb) }.code
+
+    /** ES10a GetEuiccConfiguredAddresses: the root SM-DS address. */
+    fun smdsAddress(euicc: Euicc): CardResult<String> =
+        call(READ_TIMEOUT_S) { m, cb -> m.requestSmdsAddress(euicc.cardId, DIRECT, cb) }
+
+    fun rulesAuthTable(euicc: Euicc): CardResult<EuiccRulesAuthTable> =
+        call(READ_TIMEOUT_S) { m, cb -> m.requestRulesAuthTable(euicc.cardId, DIRECT, cb) }
+
     private fun slots(): Array<UiccSlotInfo?>? = try {
         telephony?.uiccSlotsInfo
     } catch (e: RuntimeException) {
@@ -137,6 +191,9 @@ class CardClient(context: Context) {
 
         /** Enabling and disabling restart the card. */
         const val WRITE_TIMEOUT_S = 60L
+
+        /** A Bound Profile Package is hundreds of STORE DATA commands. */
+        const val INSTALL_TIMEOUT_S = 300L
         val DIRECT = Executor { it.run() }
 
         fun EuiccProfileInfo.toRaw() = RawProfile(

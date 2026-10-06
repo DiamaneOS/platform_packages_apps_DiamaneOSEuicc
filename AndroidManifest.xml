@@ -3,19 +3,22 @@
      SPDX-License-Identifier: Apache-2.0
      Copyright 2026 The DiamaneOS Project
 
-     DiamaneOS's eSIM manager (LPA): manages the profiles already on the eUICC.
+     DiamaneOS's eSIM manager (LPA): manages the profiles on the eUICC and downloads new ones.
 
      - Disabled until the user turns on Settings > Network & internet > eSIM support, which
        enables the package and restarts the phone (as GrapheneOS does for Google's LPA).
      - Two privileged permissions, allowlisted in privapp-permissions-de.diamaneos.euicc.xml:
-       WRITE_EMBEDDED_SUBSCRIPTIONS (the framework binds only an LPA that holds it; the screen
-       uses it to ask for a profile refresh) and READ_PRIVILEGED_PHONE_STATE (the slot list,
+       WRITE_EMBEDDED_SUBSCRIPTIONS (the framework binds only an LPA that holds it; the screens
+       use it for refreshes and downloads) and READ_PRIVILEGED_PHONE_STATE (the slot list,
        which gives the eUICC's card ID; every card command needs it).
-     - No INTERNET: no network access at all. No storage, no backup.
+     - INTERNET only for SGP.22 downloads, checks, searches and notifications the user starts
+       or that follow the user's own change, over HTTPS pinned to the GSMA CI roots
+       (network_security_config.xml trusts nothing else). No camera permission. No backup.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.diamaneos.euicc">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EMBEDDED_SUBSCRIPTIONS" />
 
@@ -24,7 +27,8 @@
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.DiamaneOSEuicc"
         android:enabled="false"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <!-- Only the phone process (BIND_EUICC_SERVICE, signature) can bind it. The framework
              requires the permission and a non-zero priority. Direct boot aware so the
@@ -63,5 +67,30 @@
                 <category android:name="android.service.euicc.category.EUICC_UI" />
             </intent-filter>
         </activity-alias>
+
+        <!-- Add eSIM, from the eSIM screen. -->
+        <activity
+            android:name=".ui.AddEsimActivity"
+            android:label="@string/add_title"
+            android:exported="false" />
+
+        <!-- EuiccManager.ACTION_PROVISION_EMBEDDED_SUBSCRIPTION (Settings' "Add SIM"), forwarded
+             by the phone process, which holds BIND_EUICC_SERVICE. -->
+        <activity-alias
+            android:name=".ui.ProvisionEmbeddedSubscription"
+            android:targetActivity=".ui.AddEsimActivity"
+            android:permission="android.permission.BIND_EUICC_SERVICE"
+            android:exported="true">
+            <intent-filter android:priority="100">
+                <action android:name="android.service.euicc.action.PROVISION_EMBEDDED_SUBSCRIPTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.service.euicc.category.EUICC_UI" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- EuiccManager.downloadSubscription's result, through an explicit PendingIntent. -->
+        <receiver
+            android:name=".download.DownloadResultReceiver"
+            android:exported="false" />
     </application>
 </manifest>

@@ -14,21 +14,25 @@ import de.diamaneos.euicc.core.SwitchPlan
 /**
  * Profile changes, shared by the EuiccService and the screen. Each reads the card's current
  * list, plans the change, then runs it; one change at a time in this process. Returns
- * EuiccService result codes. Logs result codes only.
+ * EuiccService result codes. Logs result codes only. [changed] runs after every successful
+ * enable, disable or delete (the eUICC may have queued notifications).
  */
-class ProfileOperations(private val client: CardClient) {
+class ProfileOperations(
+    private val client: CardClient,
+    private val changed: (Euicc) -> Unit = {},
+) {
 
     fun switch(euicc: Euicc, port: Int, iccid: String?, forceDeactivate: Boolean): Int =
-        withList(euicc, "switch") { list ->
+        notifying(euicc, withList(euicc, "switch") { list ->
             run(euicc, port, Planner.switch(list, iccid, forceDeactivate))
-        }
+        })
 
     /** Turns off [iccid] if it is still the enabled profile. */
-    fun disable(euicc: Euicc, iccid: String): Int = withList(euicc, "disable") { list ->
+    fun disable(euicc: Euicc, iccid: String): Int = notifying(euicc, withList(euicc, "disable") { list ->
         run(euicc, 0, Planner.disable(list, iccid))
-    }
+    })
 
-    fun delete(euicc: Euicc, iccid: String): Int = withList(euicc, "delete") { list ->
+    fun delete(euicc: Euicc, iccid: String): Int = notifying(euicc, withList(euicc, "delete") { list ->
         when (val plan = Planner.delete(list, iccid)) {
             is DeletePlan.Refused -> plan.result
             is DeletePlan.Delete -> Results.fromCard(client.delete(euicc, plan.profile.iccid))
@@ -41,6 +45,11 @@ class ProfileOperations(private val client: CardClient) {
                 }
             }
         }
+    })
+
+    private fun notifying(euicc: Euicc, result: Int): Int {
+        if (result == Results.OK) changed(euicc)
+        return result
     }
 
     fun rename(euicc: Euicc, iccid: String, nickname: String?): Int {
