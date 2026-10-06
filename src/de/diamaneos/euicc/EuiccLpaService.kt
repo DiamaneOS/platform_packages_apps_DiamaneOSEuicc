@@ -18,15 +18,23 @@ import android.util.Log
 import de.diamaneos.euicc.card.CardClient
 import de.diamaneos.euicc.card.Euicc
 import de.diamaneos.euicc.card.ProfileOperations
+import de.diamaneos.euicc.core.EuiccInfo1
 import de.diamaneos.euicc.core.EuiccInfo2
+import de.diamaneos.euicc.core.GsmaCi
+import de.diamaneos.euicc.core.NotificationEvents
+import de.diamaneos.euicc.core.PendingNotification
 import de.diamaneos.euicc.core.Results
+import de.diamaneos.euicc.download.CiRoots
+import de.diamaneos.euicc.download.OwnedProfiles
+import de.diamaneos.euicc.download.RspTasks
 import java.io.PrintWriter
 
 /**
  * The LPA backend the telephony framework binds (EuiccConnector) once the user turns on eSIM
- * support. Manages the profiles already on the eUICC: list, enable, disable, rename, delete,
- * erase. Downloads are not supported. The framework calls these methods on the service's worker
- * threads, so they block on the card. Never logs the EID, an ICCID or an IMSI.
+ * support: list, enable, disable, rename, delete, erase, and download the profile the user
+ * started on this app's screen (RspTasks.serve). The framework calls these methods on the
+ * service's worker threads, so they block on the card. Never logs the EID, an ICCID, an IMSI,
+ * a code or a server.
  */
 class EuiccLpaService : EuiccService() {
     private lateinit var client: CardClient
@@ -35,7 +43,7 @@ class EuiccLpaService : EuiccService() {
     override fun onCreate() {
         super.onCreate()
         client = CardClient(this)
-        operations = ProfileOperations(client)
+        operations = ProfileOperations(client) { RspTasks.sendNotificationsAsync(this, it) }
     }
 
     override fun onGetEid(slotId: Int): String? = client.euicc(slotId)?.cardId
@@ -100,7 +108,8 @@ class EuiccLpaService : EuiccService() {
     ) {
     }
 
-    // Downloads are not supported: no network access.
+    // Metadata lookups and the default list would contact servers without the user asking on
+    // this app's screen: not served. SM-DS discovery is the screen's explicit search.
     override fun onGetDownloadableSubscriptionMetadata(
         slotId: Int,
         subscription: DownloadableSubscription,
@@ -117,6 +126,7 @@ class EuiccLpaService : EuiccService() {
     override fun onGetDefaultDownloadableSubscriptionList(slotId: Int, forceDeactivateSim: Boolean) =
         GetDefaultDownloadableSubscriptionListResult(Results.NOT_SUPPORTED, null)
 
+    /** Only the download the user started on this app's screen; see RspTasks.serve. */
     override fun onDownloadSubscription(
         slotIndex: Int,
         portIndex: Int,
@@ -124,19 +134,49 @@ class EuiccLpaService : EuiccService() {
         switchAfterDownload: Boolean,
         forceDeactivateSim: Boolean,
         resolvedBundle: Bundle,
-    ) = DownloadSubscriptionResult(Results.NOT_SUPPORTED, 0, TelephonyManager.UNSUPPORTED_CARD_ID)
+    ): DownloadSubscriptionResult = try {
+        RspTasks.serve(this, slotIndex, subscription, switchAfterDownload, resolvedBundle)
+    } catch (e: RuntimeException) {
+        // An exception here would end the service's worker thread and the process.
+        Log.w(TAG, "download: ${e.javaClass.simpleName}")
+        DownloadSubscriptionResult(Results.error(Results.OPERATION_SYSTEM, Results.DETAIL_UNKNOWN), 0,
+            TelephonyManager.UNSUPPORTED_CARD_ID)
+    }
 
-    /** Counts only (dumpsys econtroller). */
+    /**
+     * dumpsys econtroller: counts, versions and public CI names only. The eUICC's SGP.22
+     * version, capabilities and CI lists decide whether a download can work.
+     */
     override fun dump(printWriter: PrintWriter) {
         val euicc = client.defaultEuicc()
         printWriter.println("DiamaneOS eSIM: ${euicc ?: "no eUICC"}")
-        if (euicc != null) {
-            val result = client.profiles(euicc)
-            val profiles = result.value
-            printWriter.println(
-                if (result.ok && profiles != null) profiles.list.summary()
-                else "profile list: card result ${result.code}")
-        }
+        if (euicc == null) return
+        val result = client.profiles(euicc)
+        val profiles = result.value
+        printWriter.println(
+            if (result.ok && profiles != null) profiles.list.summary()
+            else "profile list: card result ${result.code}")
+        val info1 = client.euiccInfo1(euicc).value?.let { runCatching { EuiccInfo1.parse(it) }.getOrNull() }
+        val info2 = EuiccInfo2.summary(client.euiccInfo2(euicc).value)
+        val roots = CiRoots.get(this)
+        printWriter.println("EUICCInfo1: svn=${info1?.svn} " +
+            "verify=[${info1?.ciForVerification?.joinToString { GsmaCi.describe(it) }}] " +
+            "sign=[${info1?.ciForSigning?.joinToString { GsmaCi.describe(it) }}]")
+        printWriter.println("EUICCInfo2: svn=${info2?.svn} profileVersion=${info2?.profileVersion} " +
+            "firmware=${info2?.firmware} ppVersion=${info2?.ppVersion} category=${info2?.category} " +
+            "capabilities=${info2?.rspCapabilities}")
+        printWriter.println("TLS anchors usable: " +
+            GsmaCi.anchors(info1?.ciForVerification.orEmpty(), roots).size + " of ${roots.size} shipped")
+        val notifications = client.retrieveNotifications(euicc, NotificationEvents.ALL).value
+            ?.mapNotNull { PendingNotification.parseOrNull(it?.data) }
+        val owned = OwnedProfiles.load(this)
+        printWriter.println("notifications: " + if (notifications == null) "unreadable" else
+            "pending=${notifications.size} " + listOf("install" to NotificationEvents.INSTALL,
+                "enable" to NotificationEvents.ENABLE, "disable" to NotificationEvents.DISABLE,
+                "delete" to NotificationEvents.DELETE).joinToString(" ") { (name, bit) ->
+                "$name=${notifications.count { it.metadata.event == bit }}"
+            } + " ours=" + (owned?.let { set -> notifications.count { n -> n.metadata.iccid?.let { it in set } == true } } ?: "locked"))
+        printWriter.println("downloaded here: ${owned?.size ?: "locked"}")
     }
 
     private inline fun withEuicc(slotId: Int, operation: (Euicc) -> Int): Int {

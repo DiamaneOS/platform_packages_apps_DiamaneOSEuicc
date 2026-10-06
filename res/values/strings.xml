@@ -40,4 +40,117 @@
     <string name="delete_text_enabled">It is turned off first.</string>
 
     <string name="failed">Couldn\'t finish. Try again.</string>
+
+    <!-- Add eSIM -->
+    <string name="add_title">Add eSIM</string>
+    <string name="add_summary">Download an eSIM with a code from your carrier</string>
+    <string name="add_restricted">Your admin doesn\'t allow changes to mobile networks</string>
+    <string name="add_with_code">With a code from your carrier</string>
+    <string name="add_more">More</string>
+    <string name="scan_title">Scan QR code</string>
+    <string name="scan_summary">Opens the camera. Scan the code in its QR mode and copy it; back here, it is pasted.</string>
+    <string name="scan_hint">Scan the code in the camera\'s QR mode, copy it, then come back</string>
+    <string name="scan_no_camera">No camera app found. Paste or type the code instead.</string>
+    <string name="paste_title">Paste code</string>
+    <string name="paste_summary">A code that starts with LPA:1$ or 1$</string>
+    <string name="paste_empty">Nothing to paste. Copy the code first.</string>
+    <string name="manual_title">Enter manually</string>
+    <string name="manual_summary">The SM-DP+ address and the activation code</string>
+    <string name="manual_address">SM-DP+ address</string>
+    <string name="manual_token">Activation code</string>
+    <string name="search_title">Search for available eSIMs</string>
+    <string name="search_summary">Asks the eSIM chip\'s discovery server whether a carrier left an eSIM for this phone</string>
+    <string name="search_no_server">The eSIM chip names no discovery server</string>
+    <string name="search_found">eSIMs waiting for this phone</string>
+    <string name="search_none_title">Nothing found</string>
+    <string name="search_none_text">No carrier has left an eSIM for this phone.</string>
+    <string name="check_title">Check a code without using it</string>
+    <string name="check_summary">Tests the carrier\'s server with the eSIM chip. Nothing is downloaded.</string>
+    <string name="check_text">The code stays usable: the server never sees its activation part.</string>
+    <string name="check_input">Code or SM-DP+ address</string>
+    <string name="next">Next</string>
+    <string name="stop">Stop</string>
+    <string name="busy">Another eSIM task is running. Try again when it is done.</string>
+
+    <string name="consent_title">Connect to %1$s?</string>
+    <string name="consent_download">To download the eSIM, this phone connects to %1$s, the carrier\'s eSIM server.\n\nThe server receives the eSIM chip\'s ID (EID), this phone\'s IMEI and model code, and its radio capabilities.</string>
+    <string name="consent_check">This phone connects to %1$s and lets the eSIM chip check it. The server receives no activation code, but sees this phone\'s address on the network.\n\nNothing is downloaded and the code stays usable.</string>
+    <string name="consent_search">This phone connects to %1$s, the discovery server named by the eSIM chip.\n\nThe server receives the eSIM chip\'s ID (EID), this phone\'s IMEI and model code, and its radio capabilities.</string>
+    <string name="consent_continue">Connect</string>
+
+    <string name="step_reading">Reading the eSIM chip…</string>
+    <string name="step_connecting">Connecting to %1$s…</string>
+    <string name="step_checking">The eSIM chip is checking %1$s…</string>
+    <string name="step_authenticating">Asking %1$s for the eSIM…</string>
+    <string name="step_confirming">Waiting for your answer</string>
+    <string name="step_preparing">Preparing the download…</string>
+    <string name="step_downloading">Downloading…</string>
+    <string name="step_installing">Installing on the eSIM chip…</string>
+    <string name="step_notifying">Telling the carrier it is installed…</string>
+
+    <string name="confirm_title">Download %1$s?</string>
+    <string name="confirm_from">From %1$s</string>
+    <string name="confirm_provider">Carrier: %1$s</string>
+    <string name="confirm_name">Name: %1$s</string>
+    <string name="confirm_ppr1">The carrier doesn\'t allow turning this eSIM off.</string>
+    <string name="confirm_ppr2">The carrier doesn\'t allow deleting this eSIM.</string>
+    <string name="confirm_ppr_consent">These rules need your agreement.</string>
+    <string name="confirm_notified">The carrier is told when this eSIM is %1$s.</string>
+    <string name="confirm_off">The eSIM is added turned off. Turn it on in the eSIM list.</string>
+    <string name="confirm_code_needed">Enter the confirmation code from your carrier.</string>
+    <string name="confirm_code_hint">Confirmation code</string>
+    <string name="confirm_download">Download</string>
+    <string name="confirm_not_now">Not now</string>
+    <string name="event_install">installed</string>
+    <string name="event_enable">turned on</string>
+    <string name="event_disable">turned off</string>
+    <string name="event_delete">deleted</string>
+
+    <string name="done_title">eSIM added</string>
+    <string name="done_text">It is turned off. Turn it on in the eSIM list.</string>
+    <string name="done_text_unsent">It is turned off. Turn it on in the eSIM list.\n\nThe carrier wasn\'t told yet; you can send that from the eSIM list.</string>
+    <string name="checked_title">Server checked</string>
+    <string name="checked_text">%1$s has a certificate from %2$s, and the eSIM chip (SGP.22 %3$s) accepted it. Nothing was downloaded; the code is still usable.</string>
+    <string name="stopped_title">Stopped</string>
+    <string name="stopped_text">Nothing was downloaded. The code is still usable.</string>
+    <string name="failed_title">Couldn\'t add the eSIM</string>
+    <string name="fail_no_ci">The eSIM chip trusts no certificate authority this phone knows, so no server can be checked.</string>
+    <string name="fail_card">The eSIM chip reported an error (%1$d).</string>
+    <string name="fail_card_refused_server">The eSIM chip didn\'t accept %1$s (%2$d). Nothing was sent to it.</string>
+    <string name="fail_network">Couldn\'t reach %1$s. Check the connection and try again.</string>
+    <string name="fail_tls">%1$s doesn\'t have a valid eSIM server certificate. Nothing was sent.</string>
+    <string name="fail_response">%1$s sent an answer this phone can\'t use.</string>
+    <string name="fail_mismatch">The answer from %1$s doesn\'t match this code. Stopped.</string>
+    <string name="fail_code_missing">A confirmation code is needed.</string>
+    <string name="fail_ppr">This eSIM has carrier rules this phone can\'t accept.</string>
+    <string name="fail_install">The eSIM chip couldn\'t install it (%1$d).</string>
+    <string name="fail_install_exists">This eSIM is already on the phone.</string>
+    <string name="fail_install_memory">The eSIM chip is full. Delete an eSIM and try again.</string>
+    <string name="fail_timeout">Stopped after no answer. The code is still usable.</string>
+    <string name="fail_framework">Android didn\'t run the download. Try again.</string>
+    <string name="fail_refused">%1$s refused: %2$s</string>
+    <string name="fail_codes">Code %1$s, reason %2$s</string>
+    <string name="refused_code">the activation code isn\'t valid, has expired or was already used.</string>
+    <string name="refused_confirmation">the confirmation code is missing or wrong.</string>
+    <string name="refused_order">the carrier\'s order has expired or ran out of attempts.</string>
+    <string name="refused_profile">the eSIM isn\'t ready, or none fits this phone.</string>
+    <string name="refused_euicc">this phone\'s eSIM chip isn\'t eligible or has no room.</string>
+    <string name="refused_other">ask the carrier.</string>
+    <string name="invalid_code">That isn\'t an eSIM activation code</string>
+    <string name="invalid_address">The SM-DP+ address isn\'t valid</string>
+    <string name="invalid_token">The activation code has characters it can\'t have</string>
+    <string name="invalid_version">This code format isn\'t supported</string>
+
+    <!-- Carrier notifications -->
+    <string name="notifications_title">Carrier notifications</string>
+    <plurals name="notifications_summary">
+        <item quantity="one">%1$d not sent</item>
+        <item quantity="other">%1$d not sent</item>
+    </plurals>
+    <string name="notification_item">%1$s · %2$s</string>
+    <string name="notification_ours">Added here</string>
+    <string name="notification_text_ours">This eSIM was added here. The notice tells its server about the change; it is sent on its own after each change.</string>
+    <string name="notification_text_other">This eSIM wasn\'t added here, so this phone doesn\'t send its notices. You can remove it.</string>
+    <string name="notification_send">Send</string>
+    <string name="notification_remove">Remove</string>
 </resources>

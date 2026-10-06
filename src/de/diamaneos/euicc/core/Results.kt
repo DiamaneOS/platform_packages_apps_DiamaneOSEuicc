@@ -29,11 +29,22 @@ object Results {
     const val OPERATION_SYSTEM = 1
     const val OPERATION_EUICC_CARD = 3
     const val OPERATION_SWITCH = 4
+    const val OPERATION_DOWNLOAD = 5
     const val OPERATION_EUICC_GSMA = 7
+    const val OPERATION_SMDX_SUBJECT_REASON_CODE = 10
+    const val OPERATION_HTTP = 11
 
     // EuiccManager error codes
+    const val ERROR_INVALID_ACTIVATION_CODE = 10001
+    const val ERROR_INVALID_CONFIRMATION_CODE = 10002
     const val ERROR_TIME_OUT = 10005
     const val ERROR_EUICC_MISSING = 10006
+    const val ERROR_INSTALL_PROFILE = 10009
+    const val ERROR_DISALLOWED_BY_PPR = 10010
+    const val ERROR_CERTIFICATE_ERROR = 10012
+    const val ERROR_CONNECTION_ERROR = 10014
+    const val ERROR_INVALID_RESPONSE = 10015
+    const val ERROR_OPERATION_BUSY = 10016
 
     // Our details, below EuiccManager's error code range
     const val DETAIL_NOT_SUPPORTED = 1
@@ -42,10 +53,12 @@ object Results {
     const val DETAIL_POLICY_RULES = 4
     const val DETAIL_INVALID_NICKNAME = 5
     const val DETAIL_UNKNOWN = 6
+    const val DETAIL_CANCELLED = 7
+    const val DETAIL_NOT_CONSENTED = 8
 
     fun error(operation: Int, detail: Int): Int = (operation shl 24) or (detail and 0xFFFFFF)
 
-    /** Downloads and other phase-two calls. */
+    /** Calls this LPA does not serve: metadata lookups and the default download list. */
     val NOT_SUPPORTED = error(OPERATION_SYSTEM, DETAIL_NOT_SUPPORTED)
     val EUICC_MISSING = error(OPERATION_SYSTEM, ERROR_EUICC_MISSING)
     val INVALID_NICKNAME = error(OPERATION_EUICC_CARD, DETAIL_INVALID_NICKNAME)
@@ -67,4 +80,44 @@ object Results {
      */
     fun isTransient(code: Int): Boolean =
         code == CARD_EUICC_NOT_FOUND || code == CARD_UNKNOWN_ERROR || code == CARD_TIMEOUT
+
+    /** The EuiccService result for a download outcome; EuiccController passes it to the caller. */
+    fun fromOutcome(outcome: Outcome): Int = when (outcome) {
+        is Outcome.Installed, is Outcome.Checked, is Outcome.Found -> OK
+        Outcome.Cancelled -> error(OPERATION_DOWNLOAD, DETAIL_CANCELLED)
+        is Outcome.Failed -> fromFailure(outcome.error)
+    }
+
+    fun fromFailure(e: RspException): Int = when (e.failure) {
+        Failure.EUICC_MISSING -> EUICC_MISSING
+        Failure.NO_TRUSTED_CI, Failure.TLS -> error(OPERATION_HTTP, ERROR_CERTIFICATE_ERROR)
+        Failure.CARD, Failure.CARD_REFUSED_SERVER ->
+            e.cardCode?.let { fromCard(it) } ?: error(OPERATION_EUICC_CARD, DETAIL_UNKNOWN)
+        Failure.NETWORK -> error(OPERATION_HTTP, ERROR_CONNECTION_ERROR)
+        Failure.HTTP_STATUS, Failure.INVALID_RESPONSE, Failure.SERVER_MISMATCH, Failure.OID_MISMATCH ->
+            error(OPERATION_DOWNLOAD, ERROR_INVALID_RESPONSE)
+        Failure.SERVER_REFUSED -> smdxCode(e.subjectCode, e.reasonCode) ?: error(OPERATION_DOWNLOAD, DETAIL_UNKNOWN)
+        Failure.CONFIRMATION_CODE_MISSING -> error(OPERATION_DOWNLOAD, ERROR_INVALID_CONFIRMATION_CODE)
+        Failure.PPR_NOT_ALLOWED -> error(OPERATION_DOWNLOAD, ERROR_DISALLOWED_BY_PPR)
+        Failure.INSTALL_FAILED -> error(OPERATION_DOWNLOAD, ERROR_INSTALL_PROFILE)
+        Failure.USER_TIMEOUT -> error(OPERATION_DOWNLOAD, ERROR_TIME_OUT)
+        Failure.BUSY -> error(OPERATION_DOWNLOAD, ERROR_OPERATION_BUSY)
+        Failure.NOT_CONSENTED -> error(OPERATION_DOWNLOAD, DETAIL_NOT_CONSENTED)
+        Failure.FRAMEWORK -> error(OPERATION_SYSTEM, DETAIL_UNKNOWN)
+    }
+
+    /**
+     * An SM-DP+ subject and reason code (SGP.22 5.2.6) in EuiccManager's
+     * OPERATION_SMDX_SUBJECT_REASON_CODE form: six nibbles, three per code. Null if a code has
+     * more than three parts or a part above 15.
+     */
+    fun smdxCode(subject: String?, reason: String?): Int? {
+        fun nibbles(code: String?): List<Int>? {
+            val parts = code?.split('.')?.map { it.toIntOrNull() ?: return null } ?: return null
+            if (parts.isEmpty() || parts.size > 3 || parts.any { it !in 0..15 }) return null
+            return List(3 - parts.size) { 0 } + parts
+        }
+        val all = (nibbles(subject) ?: return null) + (nibbles(reason) ?: return null)
+        return error(OPERATION_SMDX_SUBJECT_REASON_CODE, all.fold(0) { acc, n -> (acc shl 4) or n })
+    }
 }

@@ -3,7 +3,9 @@
 
 // DiamaneOS's eSIM manager (LPA). See README.md.
 //
-// - System API only (EuiccService, EuiccCardManager, TelephonyManager), no hidden APIs.
+// - System API only (EuiccService, EuiccCardManager, EuiccManager, TelephonyManager), no hidden
+//   APIs. SGP.22 downloads use the framework's ES10b card commands; the ES9+ client, its JSON
+//   and ASN.1 parsers and the TLS checks are in src/de/diamaneos/euicc/core and net.
 // - Privileged for its two privileged permissions, with an exact system_ext allowlist.
 // - Signing: no certificate property, so the build signs it with the default application key,
 //   not the platform key. Nothing it uses needs the platform signature or the system UID; it
@@ -29,14 +31,17 @@ prebuilt_etc {
     system_ext_specific: true,
 }
 
-// Profile-list parsing, the switch and delete plans, result codes, nicknames and the
-// EUICCInfo2 reader: plain Kotlin, run on the host.
+// Profile-list parsing, the switch and delete plans, result codes, nicknames, the activation
+// code, BER and JSON parsers, the SGP.22 structures, TLS pinning and the download and
+// notification flows: plain Kotlin, run on the host with synthetic and recorded fixtures.
 java_test_host {
     name: "DiamaneOSEuiccTests",
     srcs: [
         "src/de/diamaneos/euicc/core/*.kt",
         "tests/src/**/*.kt",
     ],
+    // The shipped GSMA CI roots, checked by CiRootsTest.
+    java_resources: ["res/raw/gsma_ci_*.pem"],
     static_libs: ["junit"],
     test_options: {
         unit_test: true,
