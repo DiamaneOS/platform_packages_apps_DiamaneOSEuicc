@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0; Copyright 2026 The DiamaneOS Project -->
+<resources>
+    <string name="app_name">eSIM</string>
+
+    <string name="eid_title">EID</string>
+    <string name="eid_hidden">Tap to show</string>
+    <string name="profiles_title">eSIMs on this phone</string>
+
+    <string name="loading">Reading the eSIM chip…</string>
+    <string name="working">Working…</string>
+    <string name="no_euicc">No eSIM chip found</string>
+    <string name="card_error">Can\'t read the eSIM chip</string>
+    <string name="no_profiles">No eSIMs on this phone</string>
+
+    <string name="unnamed_profile">eSIM</string>
+    <string name="state_on">On</string>
+    <string name="state_off">Off</string>
+    <string name="class_testing">Test profile</string>
+    <string name="class_provisioning">Provisioning profile</string>
+
+    <string name="action_turn_on">Turn on</string>
+    <string name="action_turn_off">Turn off</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_delete">Delete</string>
+
+    <string name="turn_on_title">Turn on %1$s?</string>
+    <string name="turn_on_text_switch">%1$s will be turned off.</string>
+    <string name="turn_off_title">Turn off %1$s?</string>
+    <string name="turn_off_text">You can\'t use it for calls, messages or mobile data until you turn it on again.</string>
+    <string name="turn_off_text_deleted">The carrier set this eSIM to be deleted when it is turned off.</string>
+
+    <string name="rename_title">Rename eSIM</string>
+    <string name="rename_hint">Name</string>
+    <string name="rename_save">Save</string>
+    <string name="rename_invalid">That name is too long</string>
+
+    <string name="delete_title">Delete %1$s?</string>
+    <string name="delete_text">The eSIM is removed from this phone for good. To use it again, you need a new eSIM from your carrier.</string>
+    <string name="delete_text_enabled">It is turned off first.</string>
+
+    <string name="failed">Couldn\'t finish. Try again.</string>
+</resources>
