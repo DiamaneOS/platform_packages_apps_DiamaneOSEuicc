@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0; Copyright 2026 The DiamaneOS Project -->
+<!-- Defence in depth: the app's own HTTPS client trusts only the shipped GSMA CI roots (TlsPolicy)
+     and never uses the default trust. Should anything else open a connection, it gets no
+     cleartext and trusts no CA at all, neither system nor user. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors />
+    </base-config>
+</network-security-config>
