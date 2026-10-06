@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0; Copyright 2026 The DiamaneOS Project -->
+<resources>
+    <!-- The Settings look (SettingsLib), as GrapheneOS's GmsCompat screens use it. -->
+    <style name="Theme.DiamaneOSEuicc" parent="Theme.SubSettingsBase.Expressive">
+        <!-- CollapsingToolbarBaseActivity sets its own toolbar as the action bar. -->
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <!-- Ignore taps while another app's window covers this one. -->
+        <item name="android:filterTouchesWhenObscured">true</item>
+    </style>
+</resources>
