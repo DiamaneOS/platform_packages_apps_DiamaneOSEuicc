@@ -20,6 +20,8 @@ android_app {
     static_libs: [
         "androidx.preference_preference",
         "SettingsLibCollapsingToolbarBaseActivity",
+        // SettingsBasePreferenceFragment: Settings' grouped card rows on both screens.
+        "SettingsLibSettingsTheme",
     ],
     required: ["privapp-permissions-de.diamaneos.euicc.xml"],
 }

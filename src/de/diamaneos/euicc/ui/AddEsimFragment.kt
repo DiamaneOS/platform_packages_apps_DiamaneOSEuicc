@@ -26,7 +26,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
+import com.android.settingslib.widget.SettingsBasePreferenceFragment
 import de.diamaneos.euicc.R
 import de.diamaneos.euicc.card.CardClient
 import de.diamaneos.euicc.card.Euicc
@@ -55,7 +55,7 @@ import java.util.concurrent.Executors
  * - No camera permission: QR codes are read by the camera app, then opened with Add eSIM or
  *   pasted (README, "QR codes").
  */
-class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
+class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
     private val worker = Executors.newSingleThreadExecutor()
     private val main = Handler(Looper.getMainLooper())
     private lateinit var appContext: Context
