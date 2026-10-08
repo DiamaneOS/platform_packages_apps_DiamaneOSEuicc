@@ -104,7 +104,6 @@
             android:label="@string/add_title"
             android:theme="@android:style/Theme.NoDisplay"
             android:excludeFromRecents="true"
-            android:noHistory="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
