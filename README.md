@@ -99,8 +99,12 @@ consumer devices).
 
 ## QR codes
 
-- No camera permission. "Scan QR code" opens the camera app; its QR mode
-  reads the code and copies it, and the app pastes it on return.
+- No camera permission. "Scan QR code" opens the OS's QR scanner (the
+  camera app's QR mode, as the Quick Settings tile does). Its "Open with"
+  hands the code to Add eSIM; a copied code is pasted on return.
+- "Open with" accepts `LPA:` codes from any app on the phone, not from web
+  pages. It only fills in the code: the user still agrees on the dialog
+  that names the server. The Add eSIM windows hide other apps' overlays.
 - Least privilege: no image decoding in this privileged, networked process
   and no photo files. The clipboard copy is cleared after a download.
 

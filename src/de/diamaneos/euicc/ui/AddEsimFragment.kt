@@ -6,8 +6,10 @@ package de.diamaneos.euicc.ui
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ClipboardManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +18,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -43,13 +46,14 @@ import de.diamaneos.euicc.download.RspTasks
 import java.util.concurrent.Executors
 
 /**
- * Add an eSIM: scan (the camera app's QR mode, then paste), paste or type an activation code,
- * or search the eUICC's discovery server; or check a code without using it.
+ * Add an eSIM: scan (the camera app's QR scanner, then "Open with" or paste), paste or type an
+ * activation code, or search the eUICC's discovery server; or check a code without using it.
  * - Nothing contacts a server before the user agrees on a dialog that names the server and
  *   what it receives.
  * - The profile's details are confirmed (with the confirmation code if one is required)
  *   before anything is downloaded; "Not now" and Stop keep the code usable.
- * - No camera permission: QR codes are read by the camera app and pasted (README, "QR codes").
+ * - No camera permission: QR codes are read by the camera app, then opened with Add eSIM or
+ *   pasted (README, "QR codes").
  */
 class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
     private val worker = Executors.newSingleThreadExecutor()
@@ -65,6 +69,7 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
     private var shownConfirm: ConfirmRequest? = null
     private var shownOutcome: Outcome? = null
     private var awaitingScan = false
+    private var offered: String? = null
     private var usedCode: String? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -99,7 +104,10 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
     override fun onResume() {
         super.onResume()
         attach(RspTasks.current)
-        if (awaitingScan && task == null) {
+        if (offered != null) {
+            awaitingScan = false
+            takeOffered()
+        } else if (awaitingScan && task == null) {
             awaitingScan = false
             paste(auto = true)
         }
@@ -124,15 +132,50 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
 
     // Getting the code.
 
-    /** The camera app reads the QR code (its QR mode) and copies it; back here, it is pasted. */
+    /**
+     * A code from the QR result's "Open with" ([OpenCodeActivity]), through the activity:
+     * asked about once this screen is in front.
+     */
+    fun offer(code: String) {
+        offered = code
+        awaitingScan = false
+        if (isResumed) takeOffered()
+    }
+
+    private fun takeOffered() {
+        val code = offered ?: return
+        offered = null
+        download(code)
+    }
+
+    /**
+     * The phone's QR scanner, which SystemUI's QR tile also opens (the camera app's QR mode),
+     * or else the camera. The scanned code's "Open with" brings it back here; a copied code is
+     * pasted on return.
+     */
     private fun scan() {
-        try {
-            startActivity(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))
-            awaitingScan = true
-            Toast.makeText(requireContext(), R.string.scan_hint, Toast.LENGTH_LONG).show()
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(requireContext(), R.string.scan_no_camera, Toast.LENGTH_LONG).show()
+        for (intent in listOfNotNull(qrScanner(), Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))) {
+            try {
+                startActivity(intent)
+                awaitingScan = true
+                Toast.makeText(requireContext(), R.string.scan_hint, Toast.LENGTH_LONG).show()
+                return
+            } catch (e: ActivityNotFoundException) {
+                // Try the next.
+            } catch (e: SecurityException) {
+                // Not exported: try the next.
+            }
         }
+        Toast.makeText(requireContext(), R.string.scan_no_camera, Toast.LENGTH_LONG).show()
+    }
+
+    /** The OS's QR code scanner activity (config_defaultQrCodeComponent), if it names one. */
+    private fun qrScanner(): Intent? {
+        val system = Resources.getSystem()
+        val id = system.getIdentifier("config_defaultQrCodeComponent", "string", "android")
+        if (id == 0) return null
+        val component = ComponentName.unflattenFromString(system.getString(id)) ?: return null
+        return Intent().setComponent(component)
     }
 
     /** [auto]: after the camera, quietly, and only for text that looks like a QR activation code. */
@@ -142,6 +185,10 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
             if (!auto) Toast.makeText(requireContext(), R.string.paste_empty, Toast.LENGTH_LONG).show()
             return
         }
+        download(text)
+    }
+
+    private fun download(text: String) {
         try {
             consent(ActivationCode.parse(text), RspTask.Kind.DOWNLOAD)
         } catch (e: ActivationCode.Invalid) {
@@ -341,7 +388,7 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
             }
         }
         confirmDialog = dialog
-        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        dialog.window?.let(::secure)
         dialog.show()
     }
 
@@ -485,7 +532,7 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
 
     /** Dialogs have their own windows: keep the codes in them out of screenshots too. */
     private fun AlertDialog.Builder.showSecure(): AlertDialog = create().also {
-        it.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        it.window?.let(::secure)
         it.show()
     }
 
@@ -515,11 +562,20 @@ class AddEsimFragment : PreferenceFragmentCompat(), RspTask.Listener {
         }
     }
 
-    private companion object {
-        const val STATE_SCAN = "awaiting_scan"
+    companion object {
+        private const val STATE_SCAN = "awaiting_scan"
+
+        /**
+         * No screenshots or recents preview, and no other apps' overlays over the window while
+         * it shows (any app can open this screen with a code through OpenCodeActivity).
+         */
+        fun secure(window: Window) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            window.setHideOverlayWindows(true)
+        }
 
         // SGP.22 ErrorReason (2.5.6).
-        const val INSTALL_ICCID_EXISTS = 9
-        const val INSTALL_NO_MEMORY = 10
+        private const val INSTALL_ICCID_EXISTS = 9
+        private const val INSTALL_NO_MEMORY = 10
     }
 }

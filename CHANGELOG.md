@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Scanning without copy and paste: "Scan QR code" opens the camera app's
+  QR scanner directly, and its "Open with" hands an `LPA:` code to Add eSIM
+  (any app on the phone can; web pages can't). The user still agrees before
+  anything connects. The Add eSIM windows now hide other apps' overlays.
+  Not yet built.
 - No launcher icon, as on GrapheneOS: Settings opens the eSIM screen (Network
   & internet > Manage eSIMs, while eSIM support is on) through the standard
   manage-eSIMs action, which only the phone process can forward. The screen
