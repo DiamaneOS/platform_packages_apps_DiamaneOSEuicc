@@ -26,6 +26,7 @@
 
     <string name="turn_on_title">Turn on %1$s?</string>
     <string name="turn_on_text_switch">%1$s will be turned off.</string>
+    <string name="turn_on_text_switch_deleted">The carrier set %1$s to be deleted when it is turned off. To use it again, you need a new eSIM from your carrier.</string>
     <string name="turn_off_title">Turn off %1$s?</string>
     <string name="turn_off_text">You can\'t use it for calls, messages or mobile data until you turn it on again.</string>
     <string name="turn_off_text_deleted">The carrier set this eSIM to be deleted when it is turned off.</string>
