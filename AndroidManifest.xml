@@ -43,16 +43,13 @@
             </intent-filter>
         </service>
 
+        <!-- No launcher icon, as on GrapheneOS: Settings opens the profile list (Network &
+             internet > Manage eSIMs) through the alias below. -->
         <activity
             android:name=".ui.ProfilesActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <!-- EuiccManager.ACTION_MANAGE_EMBEDDED_SUBSCRIPTIONS, forwarded by the phone process,
              which holds BIND_EUICC_SERVICE. -->
