@@ -15,8 +15,15 @@ class ProfileList(val profiles: List<Profile>, val skipped: Int) {
 
     fun find(iccid: String): Profile? = profiles.firstOrNull { it.iccid == iccid }
 
-    /** Enabled first, then by name; profiles without a name last. */
-    fun forDisplay(): List<Profile> = profiles.sortedWith(
+    /**
+     * What the user and the framework see: test profiles (a GSMA test profile some eUICCs ship
+     * with) stay hidden, as on stock, unless one is enabled.
+     */
+    val visible: List<Profile>
+        get() = profiles.filter { it.profileClass != ProfileClass.TESTING || it.isEnabled }
+
+    /** The visible profiles: enabled first, then by name; profiles without a name last. */
+    fun forDisplay(): List<Profile> = visible.sortedWith(
         compareByDescending<Profile> { it.isEnabled }
             .thenBy { it.displayName == null }
             .thenBy(String.CASE_INSENSITIVE_ORDER) { it.displayName ?: "" })

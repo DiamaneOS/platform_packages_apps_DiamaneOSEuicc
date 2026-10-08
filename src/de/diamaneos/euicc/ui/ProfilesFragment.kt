@@ -129,7 +129,7 @@ class ProfilesFragment : PreferenceFragmentCompat() {
         when {
             found == null -> showStatus(R.string.no_euicc)
             list == null -> showStatus(R.string.card_error)
-            list.profiles.isEmpty() -> showStatus(R.string.no_profiles)
+            list.visible.isEmpty() -> showStatus(R.string.no_profiles)
             else -> {
                 category.removeAll()
                 list.forDisplay().forEach { category.addPreference(row(it, list)) }

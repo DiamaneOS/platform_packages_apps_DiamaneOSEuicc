@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Test profiles (such as the GSMA test profile some eSIM chips ship with)
+  stay hidden from Settings' SIM list and the eSIM screen, as on stock,
+  unless one is turned on. Not yet built.
 - Scanning without copy and paste: "Scan QR code" opens the camera app's
   QR scanner directly, and its "Open with" hands an `LPA:` code to Add eSIM
   (any app on the phone can; web pages can't). The user still agrees before

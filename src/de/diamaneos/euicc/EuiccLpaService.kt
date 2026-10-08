@@ -58,7 +58,7 @@ class EuiccLpaService : EuiccService() {
             return GetEuiccProfileInfoListResult(Results.fromCard(result.code), null, euicc.removable)
         }
         Log.i(TAG, "profile list: ${profiles.list.summary()}")
-        val infos = profiles.list.profiles.mapNotNull { profiles.infos[it.index] }
+        val infos = profiles.list.visible.mapNotNull { profiles.infos[it.index] }
         return GetEuiccProfileInfoListResult(Results.OK, infos.toTypedArray(), euicc.removable)
     }
 
