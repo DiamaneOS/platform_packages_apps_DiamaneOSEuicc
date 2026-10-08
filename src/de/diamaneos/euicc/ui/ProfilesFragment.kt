@@ -206,7 +206,13 @@ class ProfilesFragment : PreferenceFragmentCompat() {
                 change { operations.switch(it, 0, profile.iccid, true) }
             }
             .setNegativeButton(android.R.string.cancel, null)
-        if (current != null) builder.setMessage(getString(R.string.turn_on_text_switch, name(current)))
+        if (current != null) {
+            var text = getString(R.string.turn_on_text_switch, name(current))
+            if (current.deletedWhenDisabled) {
+                text += "\n\n" + getString(R.string.turn_on_text_switch_deleted, name(current))
+            }
+            builder.setMessage(text)
+        }
         builder.show()
     }
 
