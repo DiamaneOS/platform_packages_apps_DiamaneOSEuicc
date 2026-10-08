@@ -41,7 +41,12 @@ class ProfileOperations(
                 if (disabled != Results.CARD_OK) {
                     Results.fromCard(disabled)
                 } else {
-                    Results.fromCard(deleteAfterRestart(euicc, plan.profile.iccid))
+                    // A profile its carrier set to be deleted when disabled is gone already: the
+                    // same eUICC no longer having it is the deletion that was asked for.
+                    val deleted = deleteAfterRestart(euicc, plan.profile.iccid)
+                    Results.fromCard(
+                        if (deleted == Results.CARD_PROFILE_DOES_NOT_EXIST) Results.CARD_OK else deleted
+                    )
                 }
             }
         }
@@ -96,7 +101,8 @@ class ProfileOperations(
     /**
      * The card restarts after a disable. Wait until the slot shows the same eUICC again before
      * each delete attempt (EuiccCardController logs the card ID when the card is missing), and
-     * retry while the card is not back.
+     * retry while the card is not back. A result other than CARD_TIMEOUT comes from a delete on
+     * that same eUICC.
      */
     private fun deleteAfterRestart(euicc: Euicc, iccid: String): Int {
         var code = Results.CARD_TIMEOUT

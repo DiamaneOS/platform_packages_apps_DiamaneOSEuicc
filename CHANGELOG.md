@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Deleting an enabled eSIM whose carrier set it to be deleted when turned
+  off reports success: the eUICC had already removed it, but the screen
+  said "Couldn't finish" and the framework's list was not refreshed.
+  Not yet built.
 - Turning on another eSIM warns when the carrier set the one being turned
   off to be deleted when it is turned off, as turning it off already does.
   Not yet built.
