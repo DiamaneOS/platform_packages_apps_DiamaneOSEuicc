@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No launcher icon, as on GrapheneOS: Settings opens the eSIM screen (Network
+  & internet > Manage eSIMs, while eSIM support is on) through the standard
+  manage-eSIMs action, which only the phone process can forward. The screen
+  itself is no longer exported. Not yet built.
 - Deleting an enabled eSIM whose carrier set it to be deleted when turned
   off reports success: the eUICC had already removed it, but the screen
   said "Couldn't finish" and the framework's list was not refreshed.
