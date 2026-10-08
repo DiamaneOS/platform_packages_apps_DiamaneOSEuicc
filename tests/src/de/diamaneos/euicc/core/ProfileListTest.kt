@@ -30,6 +30,23 @@ class ProfileListTest {
     }
 
     @Test
+    fun hidesTestProfilesUnlessEnabled() {
+        val parsed = list(
+            raw(ICCID_A, state = 1, profileClass = 2),
+            raw(ICCID_B, state = 0, profileClass = 0),
+            raw(ICCID_C, state = 0, profileClass = 1),
+        )
+        assertEquals(listOf(ICCID_A, ICCID_C), parsed.visible.map { it.iccid })
+        assertEquals(listOf(ICCID_A, ICCID_C), parsed.forDisplay().map { it.iccid })
+        assertEquals(3, parsed.profiles.size)
+        val enabledTest = list(
+            raw(ICCID_A, state = 0, profileClass = 2),
+            raw(ICCID_B, state = 1, profileClass = 0),
+        )
+        assertEquals(listOf(ICCID_A, ICCID_B), enabledTest.visible.map { it.iccid })
+    }
+
+    @Test
     fun unsetClassMeansOperational() {
         assertEquals(ProfileClass.OPERATIONAL, list(raw(profileClass = -1)).profiles.single().profileClass)
     }
