@@ -49,8 +49,8 @@
     <string name="add_with_code">With a code from your carrier</string>
     <string name="add_more">More</string>
     <string name="scan_title">Scan QR code</string>
-    <string name="scan_summary">Opens the camera. Scan the code in its QR mode and copy it; back here, it is pasted.</string>
-    <string name="scan_hint">Scan the code in the camera\'s QR mode, copy it, then come back</string>
+    <string name="scan_summary">Opens the camera\'s QR scanner. Open the scanned code with Add eSIM, or copy it and come back.</string>
+    <string name="scan_hint">Scan the code, then tap Open with and choose Add eSIM</string>
     <string name="scan_no_camera">No camera app found. Paste or type the code instead.</string>
     <string name="paste_title">Paste code</string>
     <string name="paste_summary">A code that starts with LPA:1$ or 1$</string>
