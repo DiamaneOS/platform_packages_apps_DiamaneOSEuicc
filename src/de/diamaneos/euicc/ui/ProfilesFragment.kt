@@ -18,7 +18,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
+import com.android.settingslib.widget.SettingsBasePreferenceFragment
 import de.diamaneos.euicc.R
 import de.diamaneos.euicc.card.CardClient
 import de.diamaneos.euicc.card.CardResult
@@ -41,7 +41,7 @@ import java.util.concurrent.Executors
  * notifications the eUICC still holds, to send (profiles added here) or remove. Card calls run
  * on a worker thread; nothing is logged.
  */
-class ProfilesFragment : PreferenceFragmentCompat() {
+class ProfilesFragment : SettingsBasePreferenceFragment() {
     private val worker = Executors.newSingleThreadExecutor()
     private val main = Handler(Looper.getMainLooper())
     private lateinit var appContext: Context
