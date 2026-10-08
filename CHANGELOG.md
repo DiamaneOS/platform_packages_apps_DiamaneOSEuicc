@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The eSIM screens use Settings' own list style (rows grouped into cards), through SettingsLib's base
+  fragment, as GrapheneOS's GmsCompat screens do. Not yet built.
 - Test profiles (such as the GSMA test profile some eSIM chips ship with)
   stay hidden from Settings' SIM list and the eSIM screen, as on stock,
   unless one is turned on. Not yet built.
