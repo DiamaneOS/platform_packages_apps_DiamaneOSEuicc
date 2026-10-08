@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Turning on another eSIM warns when the carrier set the one being turned
+  off to be deleted when it is turned off, as turning it off already does.
+  Not yet built.
 - Download eSIMs (GSMA SGP.22 v2 consumer download). Not yet built.
   - "Add eSIM" on the eSIM screen and Settings' "Add SIM": scan (camera app's
     QR mode, then paste), paste or type an activation code; confirmation code
