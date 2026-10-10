@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 The DiamaneOS Project
 
+package {
+    default_applicable_licenses: ["diamaneos_euicc_license"],
+}
+
+license {
+    name: "diamaneos_euicc_license",
+    visibility: [":__subpackages__"],
+    license_kinds: ["SPDX-license-identifier-Apache-2.0"],
+    license_text: ["LICENSE"],
+}
+
 // DiamaneOS's eSIM manager (LPA). See README.md.
 //
 // - System API only (EuiccService, EuiccCardManager, EuiccManager, TelephonyManager), no hidden
