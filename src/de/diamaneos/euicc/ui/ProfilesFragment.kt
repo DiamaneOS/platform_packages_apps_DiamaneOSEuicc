@@ -5,6 +5,7 @@ package de.diamaneos.euicc.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,6 +25,8 @@ import de.diamaneos.euicc.card.CardResult
 import de.diamaneos.euicc.card.Euicc
 import de.diamaneos.euicc.card.ProfileOperations
 import de.diamaneos.euicc.card.Profiles
+import de.diamaneos.euicc.core.NotificationEvents
+import de.diamaneos.euicc.core.NotificationFlow
 import de.diamaneos.euicc.core.Nickname
 import de.diamaneos.euicc.core.Profile
 import de.diamaneos.euicc.core.ProfileClass
@@ -31,12 +34,14 @@ import de.diamaneos.euicc.core.ProfileList
 import de.diamaneos.euicc.core.Results
 import de.diamaneos.euicc.core.SwitchConsent
 import de.diamaneos.euicc.core.readUntilSettled
+import de.diamaneos.euicc.download.RspTasks
 import java.util.concurrent.Executors
 
 /**
- * The profiles on the eUICC: the EID (hidden until tapped), then one row per profile. A row
- * offers turn on or off, rename and delete, each confirmed. Card calls run on a worker thread.
- * Nothing is logged.
+ * The profiles on the eUICC: "Add eSIM", the EID (hidden until tapped), then one row per
+ * profile. A row offers turn on or off, rename and delete, each confirmed. Below, the carrier
+ * notifications the eUICC still holds, to send (profiles added here) or remove. Card calls run
+ * on a worker thread. Nothing is logged.
  */
 class ProfilesFragment : SettingsBasePreferenceFragment() {
     private val worker = Executors.newSingleThreadExecutor()
@@ -44,18 +49,29 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
     private lateinit var appContext: Context
     private lateinit var client: CardClient
     private lateinit var operations: ProfileOperations
+    private lateinit var addEsim: Preference
     private lateinit var eid: Preference
     private lateinit var category: PreferenceCategory
+    private lateinit var notifications: Preference
     private var euicc: Euicc? = null
     private var eidShown = false
     private var busy = false
+    private var pendingNotifications: List<NotificationFlow.Entry> = emptyList()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val context = preferenceManager.context
         appContext = context.applicationContext
         client = CardClient(appContext)
-        operations = ProfileOperations(client)
+        operations = ProfileOperations(client) { RspTasks.sendNotificationsAsync(appContext, it) }
         preferenceScreen = preferenceManager.createPreferenceScreen(context)
+        addEsim = Preference(context).apply {
+            title = getString(R.string.add_title)
+            summary = getString(R.string.add_summary)
+            setOnPreferenceClickListener {
+                startActivity(Intent(context, AddEsimActivity::class.java))
+                true
+            }
+        }
         eid = Preference(context).apply {
             title = getString(R.string.eid_title)
             isVisible = false
@@ -66,8 +82,18 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
             }
         }
         category = PreferenceCategory(context).apply { title = getString(R.string.profiles_title) }
+        notifications = Preference(context).apply {
+            title = getString(R.string.notifications_title)
+            isVisible = false
+            setOnPreferenceClickListener {
+                if (!busy) showNotifications()
+                true
+            }
+        }
+        preferenceScreen.addPreference(addEsim)
         preferenceScreen.addPreference(eid)
         preferenceScreen.addPreference(category)
+        preferenceScreen.addPreference(notifications)
     }
 
     override fun onResume() {
@@ -90,19 +116,26 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
                 read = { client.defaultEuicc().let { it to it?.let { e -> client.profiles(e) } } },
                 settled = { (e, r) -> e != null && r?.value?.list != null },
             )
-            main.post { if (isAdded) show(found, result, then) }
+            val pending = found?.let { e -> RspTasks.withNotifications(appContext, e) { it.list() } }
+            main.post { if (isAdded) show(found, result, pending, then) }
         }
     }
 
     private fun show(
         found: Euicc?,
         result: CardResult<Profiles>?,
+        pending: List<NotificationFlow.Entry>?,
         then: ((ProfileList) -> Unit)?,
     ) {
         euicc = found
         busy = false
         eid.isVisible = found != null
+        addEsim.isEnabled = found != null && !restricted()
         updateEid()
+        pendingNotifications = pending.orEmpty()
+        notifications.isVisible = pendingNotifications.isNotEmpty()
+        notifications.summary = resources.getQuantityString(R.plurals.notifications_summary,
+            pendingNotifications.size, pendingNotifications.size)
         val list = result?.value?.list
         when {
             found == null -> showStatus(R.string.no_euicc)
@@ -261,6 +294,59 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
 
     private fun restricted() = requireContext().getSystemService(UserManager::class.java)
         .hasUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS)
+
+    /**
+     * The eUICC's pending notifications (SGP.22 3.5): event and server only. Those of profiles
+     * added here can be sent. Any can be removed. Sending happens on its own after changes.
+     */
+    private fun showNotifications() {
+        val entries = pendingNotifications
+        if (entries.isEmpty()) return
+        val labels = entries.map { n ->
+            getString(R.string.notification_item, eventName(n.event), n.address) +
+                if (n.ours) "\n" + getString(R.string.notification_ours) else ""
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.notifications_title)
+            .setItems(labels.toTypedArray()) { _, which -> notificationActions(entries[which]) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun notificationActions(entry: NotificationFlow.Entry) {
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.notification_item, eventName(entry.event), entry.address))
+            .setMessage(if (entry.ours) R.string.notification_text_ours else R.string.notification_text_other)
+            .setNeutralButton(android.R.string.cancel, null)
+            .setNegativeButton(R.string.notification_remove) { _, _ ->
+                notificationChange { it.remove(entry.seq); true }
+            }
+        if (entry.ours && !restricted()) {
+            builder.setPositiveButton(R.string.notification_send) { _, _ -> notificationChange { it.send(entry.seq) } }
+        }
+        builder.show()
+    }
+
+    private fun notificationChange(change: (NotificationFlow) -> Boolean) {
+        val target = euicc ?: return
+        busy = true
+        showStatus(R.string.working)
+        worker.execute {
+            val ok = RspTasks.withNotifications(appContext, target, change) == true
+            main.post {
+                if (!isAdded) return@post
+                if (!ok) Toast.makeText(requireContext(), R.string.failed, Toast.LENGTH_LONG).show()
+                reload()
+            }
+        }
+    }
+
+    private fun eventName(event: Int) = getString(when (event) {
+        NotificationEvents.INSTALL -> R.string.event_install
+        NotificationEvents.ENABLE -> R.string.event_enable
+        NotificationEvents.DISABLE -> R.string.event_disable
+        else -> R.string.event_delete
+    })
 
     /**
      * Runs a profile change, asks the framework to re-read the profiles, then reloads. On
