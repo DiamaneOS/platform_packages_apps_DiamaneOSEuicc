@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"„eSIM“ kortelė"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"„eSIM“ kortelė"</string>
+    <string name="state_on">"Įjungta"</string>
+    <string name="state_off">"Išjungta"</string>
+    <string name="action_turn_on">"Įjungti"</string>
+    <string name="action_turn_off">"Išjungti"</string>
+    <string name="action_rename">"Pervardyti"</string>
+    <string name="action_delete">"Ištrinti"</string>
+    <string name="turn_on_title">"Įjungti „<xliff:g id="CARRIER_NAME">%1$s</xliff:g>“?"</string>
+    <string name="turn_off_title">"Išjungti „<xliff:g id="CARRIER_NAME">%1$s</xliff:g>“?"</string>
+    <string name="rename_hint">"Pavadinimas"</string>
+    <string name="rename_save">"Išsaugoti"</string>
+    <string name="scan_title">"QR kodo nuskaitymas"</string>
+    <string name="next">"Kitas"</string>
+    <string name="stop">"Sustabdyti"</string>
+    <string name="consent_continue">"Prijungti"</string>
+    <string name="confirm_download">"Atsisiųsti"</string>
+    <string name="confirm_not_now">"Ne dabar"</string>
+    <string name="stopped_title">"Sustabdyta"</string>
+    <string name="notification_send">"Siųsti"</string>
+    <string name="notification_remove">"Pašalinti"</string>
+</resources>

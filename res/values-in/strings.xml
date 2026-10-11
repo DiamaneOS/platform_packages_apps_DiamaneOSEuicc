@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Aktif"</string>
+    <string name="state_off">"Nonaktif"</string>
+    <string name="action_turn_on">"Aktifkan"</string>
+    <string name="action_turn_off">"Nonaktifkan"</string>
+    <string name="action_rename">"Ganti nama"</string>
+    <string name="action_delete">"Hapus"</string>
+    <string name="turn_on_title">"Aktifkan <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Nonaktifkan <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Nama"</string>
+    <string name="rename_save">"Simpan"</string>
+    <string name="scan_title">"Memindai kode QR"</string>
+    <string name="next">"Berikutnya"</string>
+    <string name="stop">"Hentikan"</string>
+    <string name="consent_continue">"Hubungkan"</string>
+    <string name="confirm_download">"Download"</string>
+    <string name="confirm_not_now">"Lain kali"</string>
+    <string name="stopped_title">"Dihentikan"</string>
+    <string name="notification_send">"Kirim"</string>
+    <string name="notification_remove">"Hapus"</string>
+</resources>

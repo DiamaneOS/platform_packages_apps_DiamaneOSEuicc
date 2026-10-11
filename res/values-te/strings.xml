@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"ఆన్‌లో ఉంది"</string>
+    <string name="state_off">"ఆఫ్‌లో ఉంది"</string>
+    <string name="action_turn_on">"ఆన్ చేయండి"</string>
+    <string name="action_turn_off">"ఆఫ్ చేయండి"</string>
+    <string name="action_rename">"పేరు మార్చండి"</string>
+    <string name="action_delete">"తొలగించండి"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g>ను ఆన్ చేయాలా?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g>ను ఆఫ్ చేయాలా?"</string>
+    <string name="rename_hint">"పేరు"</string>
+    <string name="rename_save">"సేవ్ చేయండి"</string>
+    <string name="scan_title">"QR కోడ్‌ను స్కాన్ చేయండి"</string>
+    <string name="next">"తర్వాత"</string>
+    <string name="stop">"ఆపివేయండి"</string>
+    <string name="consent_continue">"కనెక్ట్ చేయండి"</string>
+    <string name="confirm_download">"డౌన్‌లోడ్"</string>
+    <string name="confirm_not_now">"ఇప్పుడు కాదు"</string>
+    <string name="stopped_title">"ఆపివేయబడింది"</string>
+    <string name="notification_send">"పంపండి"</string>
+    <string name="notification_remove">"తీసివేయండి"</string>
+</resources>

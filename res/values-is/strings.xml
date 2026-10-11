@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Virkt"</string>
+    <string name="state_off">"Óvirkt"</string>
+    <string name="action_turn_on">"Kveikja"</string>
+    <string name="action_turn_off">"Slökkva"</string>
+    <string name="action_rename">"Endurnefna"</string>
+    <string name="action_delete">"Eyða"</string>
+    <string name="turn_on_title">"Viltu kveikja á <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Viltu slökkva á <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Heiti"</string>
+    <string name="rename_save">"Vista"</string>
+    <string name="scan_title">"Skanna QR-kóða"</string>
+    <string name="next">"Áfram"</string>
+    <string name="stop">"Stöðva"</string>
+    <string name="consent_continue">"Tengjast"</string>
+    <string name="confirm_download">"Sækja"</string>
+    <string name="confirm_not_now">"Ekki núna"</string>
+    <string name="stopped_title">"Stöðvað"</string>
+    <string name="notification_send">"Senda"</string>
+    <string name="notification_remove">"Fjarlægja"</string>
+</resources>

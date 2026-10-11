@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"ਈ-ਸਿਮ"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"ਈ-ਸਿਮ"</string>
+    <string name="state_on">"ਚਾਲੂ ਹੈ"</string>
+    <string name="state_off">"ਬੰਦ ਹੈ"</string>
+    <string name="action_turn_on">"ਚਾਲੂ ਕਰੋ"</string>
+    <string name="action_turn_off">"ਬੰਦ ਕਰੋ"</string>
+    <string name="action_rename">"ਨਾਮ ਬਦਲੋ"</string>
+    <string name="action_delete">"ਮਿਟਾਓ"</string>
+    <string name="turn_on_title">"ਕੀ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ਨੂੰ ਚਾਲੂ ਕਰਨਾ ਹੈ?"</string>
+    <string name="turn_off_title">"ਕੀ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ਨੂੰ ਬੰਦ ਕਰਨਾ ਹੈ?"</string>
+    <string name="rename_hint">"ਨਾਮ"</string>
+    <string name="rename_save">"ਰੱਖਿਅਤ ਕਰੋ"</string>
+    <string name="scan_title">"QR ਕੋਡ ਸਕੈਨ ਕਰੋ"</string>
+    <string name="next">"ਅੱਗੇ"</string>
+    <string name="stop">"ਬੰਦ ਕਰੋ"</string>
+    <string name="consent_continue">"ਕਨੈਕਟ ਕਰੋ"</string>
+    <string name="confirm_download">"ਡਾਊਨਲੋਡ ਕਰੋ"</string>
+    <string name="confirm_not_now">"ਹੁਣੇ ਨਹੀਂ"</string>
+    <string name="stopped_title">"ਬੰਦ ਹੈ"</string>
+    <string name="notification_send">"ਭੇਜੋ"</string>
+    <string name="notification_remove">"ਹਟਾਓ"</string>
+</resources>

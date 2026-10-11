@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"E-simkaart"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"E-simkaart"</string>
+    <string name="state_on">"Aan"</string>
+    <string name="state_off">"Uit"</string>
+    <string name="action_turn_on">"Aanzetten"</string>
+    <string name="action_turn_off">"Uitzetten"</string>
+    <string name="action_rename">"Naam wijzigen"</string>
+    <string name="action_delete">"Verwijderen"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> aanzetten?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> uitzetten?"</string>
+    <string name="rename_hint">"Naam"</string>
+    <string name="rename_save">"Opslaan"</string>
+    <string name="scan_title">"QR-code scannen"</string>
+    <string name="next">"Volgende"</string>
+    <string name="stop">"Stoppen"</string>
+    <string name="consent_continue">"Verbinden"</string>
+    <string name="confirm_download">"Downloaden"</string>
+    <string name="confirm_not_now">"Niet nu"</string>
+    <string name="stopped_title">"Gestopt"</string>
+    <string name="notification_send">"Verzenden"</string>
+    <string name="notification_remove">"Verwijderen"</string>
+</resources>

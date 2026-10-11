@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"‏معرّف شريحة SIM المضمّنة (EID)"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"مفعَّلة"</string>
+    <string name="state_off">"غير مفعَّلة"</string>
+    <string name="action_turn_on">"تفعيل"</string>
+    <string name="action_turn_off">"إيقاف"</string>
+    <string name="action_rename">"إعادة تسمية"</string>
+    <string name="action_delete">"حذف"</string>
+    <string name="turn_on_title">"هل تريد تفعيل <xliff:g id="CARRIER_NAME">%1$s</xliff:g>؟"</string>
+    <string name="turn_off_title">"هل تريد إيقاف <xliff:g id="CARRIER_NAME">%1$s</xliff:g>؟"</string>
+    <string name="rename_hint">"الاسم"</string>
+    <string name="rename_save">"حفظ"</string>
+    <string name="scan_title">"المسح الضوئي لرمز الاستجابة السريعة"</string>
+    <string name="next">"التالي"</string>
+    <string name="stop">"إيقاف"</string>
+    <string name="consent_continue">"اتصال"</string>
+    <string name="confirm_download">"تنزيل"</string>
+    <string name="confirm_not_now">"لاحقًا"</string>
+    <string name="stopped_title">"متوقّف"</string>
+    <string name="notification_send">"إرسال"</string>
+    <string name="notification_remove">"إزالة"</string>
+</resources>

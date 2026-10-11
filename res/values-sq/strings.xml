@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Aktive"</string>
+    <string name="state_off">"Joaktive"</string>
+    <string name="action_turn_on">"Aktivizo"</string>
+    <string name="action_turn_off">"Çaktivizo"</string>
+    <string name="action_rename">"Riemërto"</string>
+    <string name="action_delete">"Fshi"</string>
+    <string name="turn_on_title">"Të aktivizohet <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Të çaktivizohet <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Emri"</string>
+    <string name="rename_save">"Ruaj"</string>
+    <string name="scan_title">"Skano kodin QR"</string>
+    <string name="next">"Para"</string>
+    <string name="stop">"Ndalo"</string>
+    <string name="consent_continue">"Lidh"</string>
+    <string name="confirm_download">"Shkarko"</string>
+    <string name="confirm_not_now">"Jo tani"</string>
+    <string name="stopped_title">"Ndaluar"</string>
+    <string name="notification_send">"Dërgo"</string>
+    <string name="notification_remove">"Hiq"</string>
+</resources>
