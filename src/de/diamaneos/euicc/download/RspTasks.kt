@@ -228,7 +228,7 @@ object RspTasks {
         }
         task.started = true
         val client = CardClient(context)
-        // Check the slot first: a card call to a missing card logs its EID (-176).
+        // Check the slot first: a card call to a missing card logs its EID.
         if (client.euicc(slotIndex)?.cardId != task.euicc.cardId) {
             return finish(task, failed(Failure.EUICC_MISSING))
         }
