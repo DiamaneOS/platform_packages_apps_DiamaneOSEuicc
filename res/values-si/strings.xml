@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"සක්‍රීයයි"</string>
+    <string name="state_off">"අක්‍රියයි"</string>
+    <string name="action_turn_on">"ක්‍රියාත්මක කරන්න"</string>
+    <string name="action_turn_off">"ක්‍රියා විරහිත කරන්න"</string>
+    <string name="action_rename">"යළි නම් කරන්න"</string>
+    <string name="action_delete">"මකන්න"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ක්‍රියාත්මක කරන්නද?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ක්‍රියාවිරහිත කරන්නද?"</string>
+    <string name="rename_hint">"නම"</string>
+    <string name="rename_save">"සුරකින්න"</string>
+    <string name="scan_title">"QR කේතය ස්කෑන් කරන්න"</string>
+    <string name="next">"මීළඟ"</string>
+    <string name="stop">"නවත්වන්න"</string>
+    <string name="consent_continue">"සම්බන්ධ කරන්න"</string>
+    <string name="confirm_download">"බාගන්න"</string>
+    <string name="confirm_not_now">"දැන් නොවේ"</string>
+    <string name="stopped_title">"නවත්වන ලදි"</string>
+    <string name="notification_send">"යවන්න"</string>
+    <string name="notification_remove">"ඉවත් කරන්න"</string>
+</resources>

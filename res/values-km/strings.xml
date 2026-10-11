@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"បើក"</string>
+    <string name="state_off">"បិទ"</string>
+    <string name="action_turn_on">"បើក"</string>
+    <string name="action_turn_off">"បិទ"</string>
+    <string name="action_rename">"ប្ដូរឈ្មោះ"</string>
+    <string name="action_delete">"លុប"</string>
+    <string name="turn_on_title">"បើក <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ឬ?"</string>
+    <string name="turn_off_title">"បិទ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ឬ?"</string>
+    <string name="rename_hint">"ឈ្មោះ"</string>
+    <string name="rename_save">"រក្សាទុក"</string>
+    <string name="scan_title">"ស្កេន​កូដ QR"</string>
+    <string name="next">"បន្ទាប់"</string>
+    <string name="stop">"ឈប់"</string>
+    <string name="consent_continue">"តភ្ជាប់"</string>
+    <string name="confirm_download">"ទាញយក"</string>
+    <string name="confirm_not_now">"កុំទាន់"</string>
+    <string name="stopped_title">"បានឈប់"</string>
+    <string name="notification_send">"ផ្ញើ"</string>
+    <string name="notification_remove">"ដកចេញ"</string>
+</resources>

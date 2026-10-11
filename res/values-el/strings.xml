@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Ενεργή"</string>
+    <string name="state_off">"Ανενεργή"</string>
+    <string name="action_turn_on">"Ενεργοποίηση"</string>
+    <string name="action_turn_off">"Απενεργοποίηση"</string>
+    <string name="action_rename">"Μετονομασία"</string>
+    <string name="action_delete">"Διαγραφή"</string>
+    <string name="turn_on_title">"Ενεργοποίηση <xliff:g id="CARRIER_NAME">%1$s</xliff:g>;"</string>
+    <string name="turn_off_title">"Απενεργοποίηση <xliff:g id="CARRIER_NAME">%1$s</xliff:g>;"</string>
+    <string name="rename_hint">"Όνομα"</string>
+    <string name="rename_save">"Αποθήκευση"</string>
+    <string name="scan_title">"Σάρωση κωδικού QR"</string>
+    <string name="next">"Επόμενο"</string>
+    <string name="stop">"Διακοπή"</string>
+    <string name="consent_continue">"Σύνδεση"</string>
+    <string name="confirm_download">"Λήψη"</string>
+    <string name="confirm_not_now">"Όχι τώρα"</string>
+    <string name="stopped_title">"Διακόπηκε"</string>
+    <string name="notification_send">"Αποστολή"</string>
+    <string name="notification_remove">"Κατάργηση"</string>
+</resources>

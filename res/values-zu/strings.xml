@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"I-eSIM"</string>
+    <string name="eid_title">"I-EID"</string>
+    <string name="unnamed_profile">"I-eSIM"</string>
+    <string name="state_on">"Kuvuliwe"</string>
+    <string name="state_off">"Kuvaliwe"</string>
+    <string name="action_turn_on">"Vula"</string>
+    <string name="action_turn_off">"Vala"</string>
+    <string name="action_rename">"Qamba kabusha"</string>
+    <string name="action_delete">"Susa"</string>
+    <string name="turn_on_title">"Vula i-<xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Vala i-<xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Igama"</string>
+    <string name="rename_save">"Londoloza"</string>
+    <string name="scan_title">"Skena ikhodi ye-QR"</string>
+    <string name="next">"Okulandelayo"</string>
+    <string name="stop">"Misa"</string>
+    <string name="consent_continue">"Xhuma kwi-inthanethi"</string>
+    <string name="confirm_download">"Landa"</string>
+    <string name="confirm_not_now">"Hhayi manje"</string>
+    <string name="stopped_title">"Imisiwe"</string>
+    <string name="notification_send">"Thumela"</string>
+    <string name="notification_remove">"Susa"</string>
+</resources>

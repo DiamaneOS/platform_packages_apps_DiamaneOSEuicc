@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIMa"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIMa"</string>
+    <string name="state_on">"Aktibatuta"</string>
+    <string name="state_off">"Desaktibatuta"</string>
+    <string name="action_turn_on">"Aktibatu"</string>
+    <string name="action_turn_off">"Desaktibatu"</string>
+    <string name="action_rename">"Aldatu izena"</string>
+    <string name="action_delete">"Ezabatu"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> aktibatu nahi duzu?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> desaktibatu nahi duzu?"</string>
+    <string name="rename_hint">"Izena"</string>
+    <string name="rename_save">"Gorde"</string>
+    <string name="scan_title">"Eskaneatu QR kodea"</string>
+    <string name="next">"Hurrengoa"</string>
+    <string name="stop">"Gelditu"</string>
+    <string name="consent_continue">"Konektatu"</string>
+    <string name="confirm_download">"Deskargatu"</string>
+    <string name="confirm_not_now">"Orain ez"</string>
+    <string name="stopped_title">"Geldituta"</string>
+    <string name="notification_send">"Bidali"</string>
+    <string name="notification_remove">"Kendu"</string>
+</resources>

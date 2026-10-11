@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Aktiv"</string>
+    <string name="state_off">"Deaktiv"</string>
+    <string name="action_turn_on">"Aktivləşdirin"</string>
+    <string name="action_turn_off">"Söndür"</string>
+    <string name="action_rename">"Adını dəyişdirin"</string>
+    <string name="action_delete">"Silin"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> aktiv edilsin?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> deaktiv edilsin?"</string>
+    <string name="rename_hint">"Ad"</string>
+    <string name="rename_save">"Yadda saxlayın"</string>
+    <string name="scan_title">"QR kodu skanlayın"</string>
+    <string name="next">"Növbəti"</string>
+    <string name="stop">"Dayandırın"</string>
+    <string name="consent_continue">"Qoşul"</string>
+    <string name="confirm_download">"Endirin"</string>
+    <string name="confirm_not_now">"İndi yox"</string>
+    <string name="stopped_title">"Dayandırılıb"</string>
+    <string name="notification_send">"Göndər"</string>
+    <string name="notification_remove">"Silin"</string>
+</resources>

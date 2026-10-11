@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"ஆன்"</string>
+    <string name="state_off">"ஆஃப்"</string>
+    <string name="action_turn_on">"இயக்கு"</string>
+    <string name="action_turn_off">"ஆஃப் செய்"</string>
+    <string name="action_rename">"பெயர் மாற்று"</string>
+    <string name="action_delete">"நீக்கு"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ஐ ஆன் செய்யவா?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ஐ ஆஃப் செய்யவா?"</string>
+    <string name="rename_hint">"பெயர்"</string>
+    <string name="rename_save">"சேமி"</string>
+    <string name="scan_title">"QR குறியீட்டை ஸ்கேன் செய்தல்"</string>
+    <string name="next">"அடுத்து"</string>
+    <string name="stop">"நிறுத்து"</string>
+    <string name="consent_continue">"இணை"</string>
+    <string name="confirm_download">"பதிவிறக்குவதற்கான பட்டன்"</string>
+    <string name="confirm_not_now">"இப்போது வேண்டாம்"</string>
+    <string name="stopped_title">"இயங்கவில்லை"</string>
+    <string name="notification_send">"அனுப்பு"</string>
+    <string name="notification_remove">"அகற்று"</string>
+</resources>

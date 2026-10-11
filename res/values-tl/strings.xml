@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Naka-on"</string>
+    <string name="state_off">"Naka-off"</string>
+    <string name="action_turn_on">"I-on"</string>
+    <string name="action_turn_off">"I-off"</string>
+    <string name="action_rename">"Palitan ang pangalan"</string>
+    <string name="action_delete">"I-delete"</string>
+    <string name="turn_on_title">"I-on ang <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"I-off ang <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Pangalan"</string>
+    <string name="rename_save">"I-save"</string>
+    <string name="scan_title">"I-scan ang QR code"</string>
+    <string name="next">"Susunod"</string>
+    <string name="stop">"Ihinto"</string>
+    <string name="consent_continue">"Kumonekta"</string>
+    <string name="confirm_download">"I-download"</string>
+    <string name="confirm_not_now">"Hindi ngayon"</string>
+    <string name="stopped_title">"Inihinto"</string>
+    <string name="notification_send">"Ipadala"</string>
+    <string name="notification_remove">"Alisin"</string>
+</resources>

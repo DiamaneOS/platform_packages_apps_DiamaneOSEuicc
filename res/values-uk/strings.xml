@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM-карта"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM-карта"</string>
+    <string name="state_on">"Увімкнено"</string>
+    <string name="state_off">"Вимкнено"</string>
+    <string name="action_turn_on">"Увімкнути"</string>
+    <string name="action_turn_off">"Вимкнути"</string>
+    <string name="action_rename">"Перейменувати"</string>
+    <string name="action_delete">"Видалити"</string>
+    <string name="turn_on_title">"Увімкнути оператора <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Вимкнути оператора <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Назва"</string>
+    <string name="rename_save">"Зберегти"</string>
+    <string name="scan_title">"Відскануйте QR-код"</string>
+    <string name="next">"Далі"</string>
+    <string name="stop">"Зупинити"</string>
+    <string name="consent_continue">"Підключити"</string>
+    <string name="confirm_download">"Завантажити"</string>
+    <string name="confirm_not_now">"Не зараз"</string>
+    <string name="stopped_title">"Зупинено"</string>
+    <string name="notification_send">"Надіслати"</string>
+    <string name="notification_remove">"Вилучити"</string>
+</resources>
