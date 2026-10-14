@@ -32,6 +32,7 @@ import de.diamaneos.euicc.core.Profile
 import de.diamaneos.euicc.core.ProfileClass
 import de.diamaneos.euicc.core.ProfileList
 import de.diamaneos.euicc.core.Results
+import de.diamaneos.euicc.core.SwitchConsent
 import de.diamaneos.euicc.download.RspTasks
 import java.util.concurrent.Executors
 
@@ -104,18 +105,23 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
         super.onDestroy()
     }
 
-    private fun reload() {
+    private fun reload(then: ((ProfileList) -> Unit)? = null) {
         busy = true
         showStatus(R.string.loading)
         worker.execute {
             val found = client.defaultEuicc()
             val result = found?.let { client.profiles(it) }
             val pending = found?.let { e -> RspTasks.withNotifications(appContext, e) { it.list() } }
-            main.post { if (isAdded) show(found, result, pending) }
+            main.post { if (isAdded) show(found, result, pending, then) }
         }
     }
 
-    private fun show(found: Euicc?, result: CardResult<Profiles>?, pending: List<NotificationFlow.Entry>?) {
+    private fun show(
+        found: Euicc?,
+        result: CardResult<Profiles>?,
+        pending: List<NotificationFlow.Entry>?,
+        then: ((ProfileList) -> Unit)?,
+    ) {
         euicc = found
         busy = false
         eid.isVisible = found != null
@@ -133,6 +139,7 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
             else -> {
                 category.removeAll()
                 list.forDisplay().forEach { category.addPreference(row(it, list)) }
+                if (!restricted()) then?.invoke(list)
             }
         }
     }
@@ -200,15 +207,24 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
     }
 
     private fun confirmTurnOn(profile: Profile, current: Profile?) {
+        val consent = SwitchConsent.of(current)
         val builder = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.turn_on_title, name(profile)))
             .setPositiveButton(R.string.action_turn_on) { _, _ ->
-                change { operations.switch(it, 0, profile.iccid, true) }
+                // Asks again, with the new state, if the enabled profile changed while this was open.
+                val again = { list: ProfileList ->
+                    val target = list.find(profile.iccid)
+                    val now = list.enabled
+                    if (target != null && !target.isEnabled && now?.mayDisable != false) {
+                        confirmTurnOn(target, now)
+                    }
+                }
+                change(again) { operations.switch(it, profile.iccid, consent) }
             }
             .setNegativeButton(android.R.string.cancel, null)
         if (current != null) {
             var text = getString(R.string.turn_on_text_switch, name(current))
-            if (current.deletedWhenDisabled) {
+            if (consent.deletesCurrent) {
                 text += "\n\n" + getString(R.string.turn_on_text_switch_deleted, name(current))
             }
             builder.setMessage(text)
@@ -327,8 +343,12 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
         else -> R.string.event_delete
     })
 
-    /** Runs a profile change, asks the framework to re-read the profiles, then reloads. */
-    private fun change(operation: (Euicc) -> Int) {
+    /**
+     * Runs a profile change, asks the framework to re-read the profiles, then reloads. On
+     * MUST_DEACTIVATE_SIM (the profiles changed since the user confirmed) [again] runs on the
+     * reloaded list.
+     */
+    private fun change(again: ((ProfileList) -> Unit)? = null, operation: (Euicc) -> Int) {
         val target = euicc ?: return
         busy = true
         showStatus(R.string.working)
@@ -337,6 +357,10 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
             if (result == Results.OK) refreshFramework()
             main.post {
                 if (!isAdded) return@post
+                if (result == Results.MUST_DEACTIVATE_SIM && again != null) {
+                    reload(again)
+                    return@post
+                }
                 if (result != Results.OK) {
                     Toast.makeText(requireContext(), R.string.failed, Toast.LENGTH_LONG).show()
                 }

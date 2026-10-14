@@ -31,6 +31,20 @@ sealed interface DeletePlan {
     class Refused(val result: Int) : DeletePlan
 }
 
+/**
+ * What the user agreed to in the screen's turn-on dialog: turning off the profile that was
+ * enabled then, and its deletion if [deletesCurrent].
+ */
+class SwitchConsent private constructor(private val currentIccid: String?, val deletesCurrent: Boolean) {
+    /** Whether the user agreed to what turning off [current] does now. */
+    fun covers(current: Profile): Boolean =
+        current.iccid == currentIccid && (deletesCurrent || !current.deletedWhenDisabled)
+
+    companion object {
+        fun of(current: Profile?) = SwitchConsent(current?.iccid, current?.deletedWhenDisabled == true)
+    }
+}
+
 /** Decides profile changes from the card's current list. No card access. */
 object Planner {
     /**
@@ -54,6 +68,16 @@ object Planner {
             if (!forceDeactivate) return SwitchPlan.MustDeactivate
         }
         return SwitchPlan.Enable(target)
+    }
+
+    /**
+     * The screen's turn on, planned on the list read just before the card command. If the enabled
+     * profile changed since the dialog, or would now be deleted without the user being told, the
+     * plan is MustDeactivate and the screen asks again.
+     */
+    fun switch(list: ProfileList, targetIccid: String, consent: SwitchConsent): SwitchPlan {
+        val current = list.enabled
+        return switch(list, targetIccid, forceDeactivate = current == null || consent.covers(current))
     }
 
     /** Turn off one profile, if it is still the enabled one (the screen's "Turn off"). */

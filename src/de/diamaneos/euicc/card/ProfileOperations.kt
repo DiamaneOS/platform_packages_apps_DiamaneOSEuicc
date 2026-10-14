@@ -9,6 +9,7 @@ import de.diamaneos.euicc.core.Nickname
 import de.diamaneos.euicc.core.Planner
 import de.diamaneos.euicc.core.ProfileList
 import de.diamaneos.euicc.core.Results
+import de.diamaneos.euicc.core.SwitchConsent
 import de.diamaneos.euicc.core.SwitchPlan
 
 /**
@@ -25,6 +26,12 @@ class ProfileOperations(
     fun switch(euicc: Euicc, port: Int, iccid: String?, forceDeactivate: Boolean): Int =
         notifying(euicc, withList(euicc, "switch") { list ->
             run(euicc, port, Planner.switch(list, iccid, forceDeactivate))
+        })
+
+    /** The screen's turn on. MUST_DEACTIVATE_SIM means [consent] no longer fits: ask again. */
+    fun switch(euicc: Euicc, iccid: String, consent: SwitchConsent): Int =
+        notifying(euicc, withList(euicc, "switch") { list ->
+            run(euicc, 0, Planner.switch(list, iccid, consent))
         })
 
     /** Turns off [iccid] if it is still the enabled profile. */

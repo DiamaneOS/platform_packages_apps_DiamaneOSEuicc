@@ -4,6 +4,7 @@
 package de.diamaneos.euicc.core
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -27,6 +28,32 @@ class PlannerTest {
         assertSame(SwitchPlan.MustDeactivate, Planner.switch(profiles, ICCID_B, forceDeactivate = false))
         val plan = Planner.switch(profiles, ICCID_B, forceDeactivate = true)
         assertSame(profiles.find(ICCID_B), (plan as SwitchPlan.Enable).profile)
+    }
+
+    @Test
+    fun screenSwitchAsksAgainWhenTheEnabledProfileChanged() {
+        val shown = list(raw(ICCID_A, state = 1), raw(ICCID_B), raw(ICCID_C))
+        val consent = SwitchConsent.of(shown.enabled)
+        assertTrue(Planner.switch(shown, ICCID_B, consent) is SwitchPlan.Enable)
+        // Nothing to turn off any more: nothing to ask.
+        assertTrue(Planner.switch(list(raw(ICCID_A), raw(ICCID_B)), ICCID_B, consent) is SwitchPlan.Enable)
+        val otherOn = list(raw(ICCID_A), raw(ICCID_B), raw(ICCID_C, state = 1))
+        assertSame(SwitchPlan.MustDeactivate, Planner.switch(otherOn, ICCID_B, consent))
+        assertSame(SwitchPlan.MustDeactivate, Planner.switch(shown, ICCID_B, SwitchConsent.of(null)))
+    }
+
+    @Test
+    fun screenSwitchNeedsConsentToTheDeletion() {
+        val deleting = list(raw(ICCID_A, state = 1, policyRules = PolicyRules.DELETE_AFTER_DISABLING), raw(ICCID_B))
+        val told = SwitchConsent.of(deleting.enabled)
+        assertTrue(told.deletesCurrent)
+        assertTrue(Planner.switch(deleting, ICCID_B, told) is SwitchPlan.Enable)
+        // The dialog showed only "turned off", then the rule appeared.
+        val untold = SwitchConsent.of(list(raw(ICCID_A, state = 1), raw(ICCID_B)).enabled)
+        assertFalse(untold.deletesCurrent)
+        assertSame(SwitchPlan.MustDeactivate, Planner.switch(deleting, ICCID_B, untold))
+        val locked = list(raw(ICCID_A, state = 1, policyRules = PolicyRules.DO_NOT_DISABLE), raw(ICCID_B))
+        assertEquals(switchPolicy, (Planner.switch(locked, ICCID_B, untold) as SwitchPlan.Refused).result)
     }
 
     @Test

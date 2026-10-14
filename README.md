@@ -19,6 +19,8 @@ consumer devices).
 - Test profiles stay hidden unless one is turned on.
 - Warns before a change turns off a profile that its carrier set to be deleted
   when turned off.
+  - Turning on another profile asks again if the one that is on changed while
+    the dialog was open.
 - Erases the eUICC's operational profiles when Android asks for it.
 - Card commands are Android's own (`EuiccCardManager`, served by
   `EuiccCardController` in the phone process over the radio's logical
