@@ -33,6 +33,7 @@ import de.diamaneos.euicc.core.ProfileClass
 import de.diamaneos.euicc.core.ProfileList
 import de.diamaneos.euicc.core.Results
 import de.diamaneos.euicc.core.SwitchConsent
+import de.diamaneos.euicc.core.readUntilSettled
 import de.diamaneos.euicc.download.RspTasks
 import java.util.concurrent.Executors
 
@@ -105,12 +106,16 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
         super.onDestroy()
     }
 
-    private fun reload(then: ((ProfileList) -> Unit)? = null) {
+    /** [settle]: right after a switch, keep reading while the card restarts. */
+    private fun reload(then: ((ProfileList) -> Unit)? = null, settle: Boolean = false) {
         busy = true
         showStatus(R.string.loading)
         worker.execute {
-            val found = client.defaultEuicc()
-            val result = found?.let { client.profiles(it) }
+            val (found, result) = readUntilSettled(
+                if (settle) SETTLE_ATTEMPTS else 1, SETTLE_PAUSE_MS,
+                read = { client.defaultEuicc().let { it to it?.let { e -> client.profiles(e) } } },
+                settled = { (e, r) -> e != null && r?.value?.list != null },
+            )
             val pending = found?.let { e -> RspTasks.withNotifications(appContext, e) { it.list() } }
             main.post { if (isAdded) show(found, result, pending, then) }
         }
@@ -364,7 +369,7 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
                 if (result != Results.OK) {
                     Toast.makeText(requireContext(), R.string.failed, Toast.LENGTH_LONG).show()
                 }
-                reload()
+                reload(settle = result == Results.OK)
             }
         }
     }
@@ -381,5 +386,8 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
 
     private companion object {
         const val TAG = "DiamaneOSEuicc"
+        // The FP6's eUICC answers again within a few seconds after a switch.
+        const val SETTLE_ATTEMPTS = 8
+        const val SETTLE_PAUSE_MS = 1000L
     }
 }
