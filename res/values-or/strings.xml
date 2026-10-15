@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"ଚାଲୁ ଅଛି"</string>
+    <string name="state_off">"ବନ୍ଦ ଅଛି"</string>
+    <string name="action_turn_on">"ଚାଲୁ କରନ୍ତୁ"</string>
+    <string name="action_turn_off">"ବନ୍ଦ କରନ୍ତୁ"</string>
+    <string name="action_rename">"ରିନେମ କରନ୍ତୁ"</string>
+    <string name="action_delete">"ଡିଲିଟ କରନ୍ତୁ"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g>କୁ ଚାଲୁ କରିବେ?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ବନ୍ଦ କରିବେ?"</string>
+    <string name="rename_hint">"ନାମ"</string>
+    <string name="rename_save">"ସେଭ୍ କରନ୍ତୁ"</string>
+    <string name="scan_title">"QR କୋଡ ସ୍କାନ କରନ୍ତୁ"</string>
+    <string name="next">"ପରବର୍ତ୍ତୀ"</string>
+    <string name="stop">"ବନ୍ଦ କରନ୍ତୁ"</string>
+    <string name="consent_continue">"କନେକ୍ଟ କରନ୍ତୁ"</string>
+    <string name="confirm_download">"ଡାଉନଲୋଡ୍ କରନ୍ତୁ"</string>
+    <string name="confirm_not_now">"ବର୍ତ୍ତମାନ ନୁହେଁ"</string>
+    <string name="stopped_title">"ବନ୍ଦ ହୋଇଛି"</string>
+    <string name="notification_send">"ପଠାନ୍ତୁ"</string>
+    <string name="notification_remove">"କାଢ଼ି ଦିଅନ୍ତୁ"</string>
+</resources>

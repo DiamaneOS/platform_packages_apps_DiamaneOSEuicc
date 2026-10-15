@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"ເປີດຢູ່"</string>
+    <string name="state_off">"ປິດຢູ່"</string>
+    <string name="action_turn_on">"ເປີດ​ໃຊ້"</string>
+    <string name="action_turn_off">"ປິດ"</string>
+    <string name="action_rename">"ປ່ຽນຊື່"</string>
+    <string name="action_delete">"ລຶບ"</string>
+    <string name="turn_on_title">"ເປີດໃຊ້ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ບໍ?"</string>
+    <string name="turn_off_title">"ປິດ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> ໄວ້ບໍ?"</string>
+    <string name="rename_hint">"ຊື່"</string>
+    <string name="rename_save">"ບັນທຶກ"</string>
+    <string name="scan_title">"ສະແກນລະຫັດ QR"</string>
+    <string name="next">"ຕໍ່ໄປ"</string>
+    <string name="stop">"ຢຸດ"</string>
+    <string name="consent_continue">"ເຊື່ອມຕໍ່"</string>
+    <string name="confirm_download">"ດາວໂຫຼດ"</string>
+    <string name="confirm_not_now">"ບໍ່ຟ້າວເທື່ອ"</string>
+    <string name="stopped_title">"ຢຸດແລ້ວ"</string>
+    <string name="notification_send">"ສົ່ງ"</string>
+    <string name="notification_remove">"ລຶບອອກ"</string>
+</resources>

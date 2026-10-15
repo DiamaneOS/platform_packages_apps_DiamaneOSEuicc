@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Açık"</string>
+    <string name="state_off">"Kapalı"</string>
+    <string name="action_turn_on">"Aç"</string>
+    <string name="action_turn_off">"Kapat"</string>
+    <string name="action_rename">"Yeniden adlandır"</string>
+    <string name="action_delete">"Sil"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> etkinleştirilsin mi?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> devre dışı bırakılsın mı?"</string>
+    <string name="rename_hint">"Ad"</string>
+    <string name="rename_save">"Kaydet"</string>
+    <string name="scan_title">"QR kodunu tara"</string>
+    <string name="next">"Sonraki"</string>
+    <string name="stop">"Durdur"</string>
+    <string name="consent_continue">"Bağlan"</string>
+    <string name="confirm_download">"İndir"</string>
+    <string name="confirm_not_now">"Şimdi değil"</string>
+    <string name="stopped_title">"Durduruldu"</string>
+    <string name="notification_send">"Gönder"</string>
+    <string name="notification_remove">"Kaldır"</string>
+</resources>

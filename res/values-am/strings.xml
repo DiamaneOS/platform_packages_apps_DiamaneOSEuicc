@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"ኢሲም"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"ኢሲም"</string>
+    <string name="state_on">"በርቷል"</string>
+    <string name="state_off">"ጠፍቷል"</string>
+    <string name="action_turn_on">"አብራ"</string>
+    <string name="action_turn_off">"አጥፋ"</string>
+    <string name="action_rename">"እንደገና ሰይም"</string>
+    <string name="action_delete">"ሰርዝ"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ይብራ?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> ይጥፋ?"</string>
+    <string name="rename_hint">"ስም"</string>
+    <string name="rename_save">"አስቀምጥ"</string>
+    <string name="scan_title">"QR ኮድን ይቃኙ"</string>
+    <string name="next">"ቀጣይ"</string>
+    <string name="stop">"መቆሚያ"</string>
+    <string name="consent_continue">"አያይዝ"</string>
+    <string name="confirm_download">"አውርድ"</string>
+    <string name="confirm_not_now">"አሁን አይደለም"</string>
+    <string name="stopped_title">"ቆሟል"</string>
+    <string name="notification_send">"ላክ"</string>
+    <string name="notification_remove">"አስወግድ"</string>
+</resources>

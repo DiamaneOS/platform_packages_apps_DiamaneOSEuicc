@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM karte"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM karte"</string>
+    <string name="state_on">"Ieslēgts"</string>
+    <string name="state_off">"Izslēgts"</string>
+    <string name="action_turn_on">"Ieslēgt"</string>
+    <string name="action_turn_off">"Izslēgt"</string>
+    <string name="action_rename">"Pārdēvēt"</string>
+    <string name="action_delete">"Dzēst"</string>
+    <string name="turn_on_title">"Vai ieslēgt operatoru <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Vai izslēgt pakalpojumu <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Vārds"</string>
+    <string name="rename_save">"Saglabāt"</string>
+    <string name="scan_title">"Kvadrātkoda skenēšana"</string>
+    <string name="next">"Tālāk"</string>
+    <string name="stop">"Apturēt"</string>
+    <string name="consent_continue">"Izveidot savienojumu"</string>
+    <string name="confirm_download">"Lejupielādēt"</string>
+    <string name="confirm_not_now">"Vēlāk"</string>
+    <string name="stopped_title">"Apturēta"</string>
+    <string name="notification_send">"Sūtīt"</string>
+    <string name="notification_remove">"Noņemt"</string>
+</resources>

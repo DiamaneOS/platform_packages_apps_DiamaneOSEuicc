@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"ই-ছিম"</string>
+    <string name="eid_title">"ইআইডি"</string>
+    <string name="unnamed_profile">"ই-ছিম"</string>
+    <string name="state_on">"অন আছে"</string>
+    <string name="state_off">"অফ আছে"</string>
+    <string name="action_turn_on">"অন কৰক"</string>
+    <string name="action_turn_off">"অফ কৰক"</string>
+    <string name="action_rename">"নতুন নাম দিয়ক"</string>
+    <string name="action_delete">"মচক"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> অন কৰিবনে?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> অফ কৰিবনে?"</string>
+    <string name="rename_hint">"নাম"</string>
+    <string name="rename_save">"ছেভ কৰক"</string>
+    <string name="scan_title">"কিউআৰ ক’ড স্কেন কৰক"</string>
+    <string name="next">"পৰৱৰ্তী"</string>
+    <string name="stop">"বন্ধ কৰক"</string>
+    <string name="consent_continue">"সংযোগ কৰক"</string>
+    <string name="confirm_download">"ডাউনল’ড কৰক"</string>
+    <string name="confirm_not_now">"এতিয়া নহয়"</string>
+    <string name="stopped_title">"বন্ধ হ’ল"</string>
+    <string name="notification_send">"প্রেৰণ কৰক"</string>
+    <string name="notification_remove">"আঁতৰাওক"</string>
+</resources>

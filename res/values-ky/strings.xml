@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM-карта"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM-карта"</string>
+    <string name="state_on">"Күйүк"</string>
+    <string name="state_off">"Өчүк"</string>
+    <string name="action_turn_on">"Күйгүзүү"</string>
+    <string name="action_turn_off">"Өчүрүү"</string>
+    <string name="action_rename">"Аталышын өзгөртүү"</string>
+    <string name="action_delete">"Өчүрүү"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> күйгүзүлсүнбү?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> өчүрүлсүнбү?"</string>
+    <string name="rename_hint">"Аталышы"</string>
+    <string name="rename_save">"Сактоо"</string>
+    <string name="scan_title">"QR кодду скандоо"</string>
+    <string name="next">"Кийинки"</string>
+    <string name="stop">"Токтотуу"</string>
+    <string name="consent_continue">"Туташуу"</string>
+    <string name="confirm_download">"Жүктөп алуу"</string>
+    <string name="confirm_not_now">"Азыр эмес"</string>
+    <string name="stopped_title">"Токтотулду"</string>
+    <string name="notification_send">"Жөнөтүү"</string>
+    <string name="notification_remove">"Өчүрүү"</string>
+</resources>

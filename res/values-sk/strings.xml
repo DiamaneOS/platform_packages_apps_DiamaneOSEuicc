@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Zapnutá"</string>
+    <string name="state_off">"Vypnutá"</string>
+    <string name="action_turn_on">"Zapnúť"</string>
+    <string name="action_turn_off">"Vypnúť"</string>
+    <string name="action_rename">"Premenovať"</string>
+    <string name="action_delete">"Odstrániť"</string>
+    <string name="turn_on_title">"Chcete zapnúť operátora <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Chcete vypnúť operátora <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Názov"</string>
+    <string name="rename_save">"Uložiť"</string>
+    <string name="scan_title">"Naskenujte QR kód"</string>
+    <string name="next">"Ďalej"</string>
+    <string name="stop">"Zastaviť"</string>
+    <string name="consent_continue">"Pripojiť"</string>
+    <string name="confirm_download">"Stiahnuť"</string>
+    <string name="confirm_not_now">"Teraz nie"</string>
+    <string name="stopped_title">"Zastavená"</string>
+    <string name="notification_send">"Odoslať"</string>
+    <string name="notification_remove">"Odstrániť"</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"사용"</string>
+    <string name="state_off">"사용 안함"</string>
+    <string name="action_turn_on">"사용 설정"</string>
+    <string name="action_turn_off">"사용 중지"</string>
+    <string name="action_rename">"이름 바꾸기"</string>
+    <string name="action_delete">"삭제"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> 서비스를 사용하시겠습니까?"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g>을(를) 사용 중지하시겠습니까?"</string>
+    <string name="rename_hint">"이름"</string>
+    <string name="rename_save">"저장"</string>
+    <string name="scan_title">"QR 코드 스캔"</string>
+    <string name="next">"다음"</string>
+    <string name="stop">"중지"</string>
+    <string name="consent_continue">"연결"</string>
+    <string name="confirm_download">"다운로드"</string>
+    <string name="confirm_not_now">"나중에"</string>
+    <string name="stopped_title">"중지됨"</string>
+    <string name="notification_send">"전송"</string>
+    <string name="notification_remove">"삭제"</string>
+</resources>

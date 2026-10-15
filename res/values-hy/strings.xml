@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM քարտ"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM քարտ"</string>
+    <string name="state_on">"Միացված է"</string>
+    <string name="state_off">"Անջատված է"</string>
+    <string name="action_turn_on">"Միացնել"</string>
+    <string name="action_turn_off">"Անջատել"</string>
+    <string name="action_rename">"Վերանվանել"</string>
+    <string name="action_delete">"Ջնջել"</string>
+    <string name="turn_on_title">"Միացնե՞լ <xliff:g id="CARRIER_NAME">%1$s</xliff:g>-ը"</string>
+    <string name="turn_off_title">"Անջատե՞լ <xliff:g id="CARRIER_NAME">%1$s</xliff:g> օպերատորին"</string>
+    <string name="rename_hint">"Անուն"</string>
+    <string name="rename_save">"Պահել"</string>
+    <string name="scan_title">"QR կոդի սկանավորում"</string>
+    <string name="next">"Հաջորդ"</string>
+    <string name="stop">"Կանգնեցնել"</string>
+    <string name="consent_continue">"Միանալ"</string>
+    <string name="confirm_download">"Ներբեռնել"</string>
+    <string name="confirm_not_now">"Ոչ հիմա"</string>
+    <string name="stopped_title">"Կանգնեցված է"</string>
+    <string name="notification_send">"Ուղարկել"</string>
+    <string name="notification_remove">"Հեռացնել"</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Päällä"</string>
+    <string name="state_off">"Pois päältä"</string>
+    <string name="action_turn_on">"Laita päälle"</string>
+    <string name="action_turn_off">"Laita pois päältä"</string>
+    <string name="action_rename">"Nimeä uudelleen"</string>
+    <string name="action_delete">"Poista"</string>
+    <string name="turn_on_title">"Laitetaanko <xliff:g id="CARRIER_NAME">%1$s</xliff:g> päälle?"</string>
+    <string name="turn_off_title">"Laitetaanko <xliff:g id="CARRIER_NAME">%1$s</xliff:g> pois päältä?"</string>
+    <string name="rename_hint">"Nimi"</string>
+    <string name="rename_save">"Tallenna"</string>
+    <string name="scan_title">"Skannaa QR-koodi"</string>
+    <string name="next">"Seuraava"</string>
+    <string name="stop">"Pysäytä"</string>
+    <string name="consent_continue">"Yhdistä"</string>
+    <string name="confirm_download">"Lataa"</string>
+    <string name="confirm_not_now">"Ei nyt"</string>
+    <string name="stopped_title">"Pysäytetty"</string>
+    <string name="notification_send">"Lähetä"</string>
+    <string name="notification_remove">"Poista"</string>
+</resources>

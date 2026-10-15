@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM 卡"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM 卡"</string>
+    <string name="state_on">"已启用"</string>
+    <string name="state_off">"已停用"</string>
+    <string name="action_turn_on">"开启"</string>
+    <string name="action_turn_off">"关闭"</string>
+    <string name="action_rename">"重命名"</string>
+    <string name="action_delete">"删除"</string>
+    <string name="turn_on_title">"要启用<xliff:g id="CARRIER_NAME">%1$s</xliff:g>吗？"</string>
+    <string name="turn_off_title">"要停用“<xliff:g id="CARRIER_NAME">%1$s</xliff:g>”吗？"</string>
+    <string name="rename_hint">"名称"</string>
+    <string name="rename_save">"保存"</string>
+    <string name="scan_title">"扫描二维码"</string>
+    <string name="next">"继续"</string>
+    <string name="stop">"停止"</string>
+    <string name="consent_continue">"连接"</string>
+    <string name="confirm_download">"下载"</string>
+    <string name="confirm_not_now">"以后再说"</string>
+    <string name="stopped_title">"已停止"</string>
+    <string name="notification_send">"发送"</string>
+    <string name="notification_remove">"移除"</string>
+</resources>

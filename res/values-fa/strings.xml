@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"سیم‌کارت داخلی"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"سیم‌کارت داخلی"</string>
+    <string name="state_on">"روشن"</string>
+    <string name="state_off">"خاموش"</string>
+    <string name="action_turn_on">"روشن کردن"</string>
+    <string name="action_turn_off">"خاموش کردن"</string>
+    <string name="action_rename">"تغییر نام"</string>
+    <string name="action_delete">"حذف"</string>
+    <string name="turn_on_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> روشن شود؟"</string>
+    <string name="turn_off_title">"<xliff:g id="CARRIER_NAME">%1$s</xliff:g> خاموش شود؟"</string>
+    <string name="rename_hint">"نام"</string>
+    <string name="rename_save">"ذخیره"</string>
+    <string name="scan_title">"اسکن رمزینه پاسخ‌سریع"</string>
+    <string name="next">"بعدی"</string>
+    <string name="stop">"ایست"</string>
+    <string name="consent_continue">"متصل کردن"</string>
+    <string name="confirm_download">"بارگیری"</string>
+    <string name="confirm_not_now">"حالا نه"</string>
+    <string name="stopped_title">"متوقف شده"</string>
+    <string name="notification_send">"ارسال"</string>
+    <string name="notification_remove">"برداشتن"</string>
+</resources>

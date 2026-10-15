@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"Kartica e-SIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"Kartica e-SIM"</string>
+    <string name="state_on">"Vklopljeno"</string>
+    <string name="state_off">"Izklopljeno"</string>
+    <string name="action_turn_on">"Vklopi"</string>
+    <string name="action_turn_off">"Izklopi"</string>
+    <string name="action_rename">"Preimenuj"</string>
+    <string name="action_delete">"Izbriši"</string>
+    <string name="turn_on_title">"Želite vklopiti storitev operaterja <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Želite izklopiti kartico <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Ime"</string>
+    <string name="rename_save">"Shrani"</string>
+    <string name="scan_title">"Optično branje kode QR"</string>
+    <string name="next">"Naprej"</string>
+    <string name="stop">"Ustavi"</string>
+    <string name="consent_continue">"Vzpostavi povezavo"</string>
+    <string name="confirm_download">"Prenos"</string>
+    <string name="confirm_not_now">"Ne zdaj"</string>
+    <string name="stopped_title">"Ustavljeno"</string>
+    <string name="notification_send">"Pošiljanje"</string>
+    <string name="notification_remove">"Odstrani"</string>
+</resources>

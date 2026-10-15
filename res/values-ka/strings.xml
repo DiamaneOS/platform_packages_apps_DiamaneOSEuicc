@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"ჩართულია"</string>
+    <string name="state_off">"გამორთულია"</string>
+    <string name="action_turn_on">"ჩართვა"</string>
+    <string name="action_turn_off">"გამორთვა"</string>
+    <string name="action_rename">"გადარქმევა"</string>
+    <string name="action_delete">"წაშლა"</string>
+    <string name="turn_on_title">"გსურთ <xliff:g id="CARRIER_NAME">%1$s</xliff:g>-ის ჩართვა?"</string>
+    <string name="turn_off_title">"გამოირთოს <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"სახელი"</string>
+    <string name="rename_save">"შენახვა"</string>
+    <string name="scan_title">"QR კოდის სკანირება"</string>
+    <string name="next">"შემდეგი"</string>
+    <string name="stop">"შეწყვეტა"</string>
+    <string name="consent_continue">"დაკავშირება"</string>
+    <string name="confirm_download">"ჩამოტვირთვა"</string>
+    <string name="confirm_not_now">"ახლა არა"</string>
+    <string name="stopped_title">"შეწყვეტილია"</string>
+    <string name="notification_send">"გაგზავნა"</string>
+    <string name="notification_remove">"ამოშლა"</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Android's own translations, copied unchanged. Generated; do not edit by hand. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">"eSIM"</string>
+    <string name="eid_title">"EID"</string>
+    <string name="unnamed_profile">"eSIM"</string>
+    <string name="state_on">"Activada"</string>
+    <string name="state_off">"Desactivat"</string>
+    <string name="action_turn_on">"Activa"</string>
+    <string name="action_turn_off">"Desactiva"</string>
+    <string name="action_rename">"Canvia el nom"</string>
+    <string name="action_delete">"Suprimeix"</string>
+    <string name="turn_on_title">"Vols activar <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="turn_off_title">"Vols desactivar <xliff:g id="CARRIER_NAME">%1$s</xliff:g>?"</string>
+    <string name="rename_hint">"Nom"</string>
+    <string name="rename_save">"Desa"</string>
+    <string name="scan_title">"Escaneja un codi QR"</string>
+    <string name="next">"Següent"</string>
+    <string name="stop">"Atura"</string>
+    <string name="consent_continue">"Connecta"</string>
+    <string name="confirm_download">"Baixa"</string>
+    <string name="confirm_not_now">"Ara no"</string>
+    <string name="stopped_title">"Aturada"</string>
+    <string name="notification_send">"Envia"</string>
+    <string name="notification_remove">"Suprimeix"</string>
+</resources>
