@@ -3,7 +3,7 @@
 
 package de.diamaneos.euicc.core
 
-// Made-up identifiers in the ICCID format; no real card.
+// Made-up identifiers in the ICCID format. No real card.
 const val ICCID_A = "8949000000000000001"
 const val ICCID_B = "8949000000000000002"
 const val ICCID_C = "8949000000000000003"

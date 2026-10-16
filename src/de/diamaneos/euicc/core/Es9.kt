@@ -5,7 +5,7 @@ package de.diamaneos.euicc.core
 
 import java.util.Base64
 
-/** Why an RSP operation stopped. Shown to the user as text; logged as the name only. */
+/** Why an RSP operation stopped. Shown to the user as text. Logged as the name only. */
 enum class Failure {
     /** No eUICC in the slot, or it went away. */
     EUICC_MISSING,
@@ -22,7 +22,7 @@ enum class Failure {
     /** No connection, a timeout or a broken stream. */
     NETWORK,
 
-    /** The server's TLS certificate failed the SGP.22 checks; nothing was sent. */
+    /** The server's TLS certificate failed the SGP.22 checks. Nothing was sent. */
     TLS,
 
     /** An HTTP status other than the one the function uses (redirects included). */
@@ -73,7 +73,7 @@ class RspException(
 
 /**
  * ES9+ and ES11 over HTTPS with the JSON binding (SGP.22 v2.5 sections 5.6, 5.8, 6.1 and 6.5):
- * request bodies and strict response parsing. Binary fields are base64; transaction IDs are
+ * request bodies and strict response parsing. Binary fields are base64. Transaction IDs are
  * hexadecimal.
  */
 object Es9 {
@@ -154,7 +154,7 @@ object Es9 {
             transactionId = transactionId(body),
             serverSigned1 = tlv(body, "serverSigned1", 0x30),
             serverSignature1 = tlv(body, "serverSignature1", 0x5F37),
-            // The schema's name; SGP.22 Annex I spells it "euiccCiPKIdTobeUsed".
+            // The schema's name. SGP.22 Annex I spells it "euiccCiPKIdTobeUsed".
             euiccCiPkIdToBeUsed = tlv(body, if (body.members.containsKey("euiccCiPKIdToBeUsed")) "euiccCiPKIdToBeUsed" else "euiccCiPKIdTobeUsed", 0x04),
             serverCertificate = tlv(body, "serverCertificate", 0x30),
         )
@@ -195,7 +195,7 @@ object Es9 {
     }
 
     /**
-     * The JSON response header (6.5.1.4): Executed-Success or Executed-WithWarning go on;
+     * The JSON response header (6.5.1.4): Executed-Success or Executed-WithWarning go on.
      * Failed and Expired throw SERVER_REFUSED with the status codes if they are well formed.
      * The server's "message" text is never read.
      */

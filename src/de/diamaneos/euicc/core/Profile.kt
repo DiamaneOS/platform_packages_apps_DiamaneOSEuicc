@@ -44,7 +44,7 @@ class Profile(
     val deletedWhenDisabled: Boolean
         get() = policyRules and PolicyRules.DELETE_AFTER_DISABLING != 0
 
-    /** The nickname, else the profile name, else the provider; null if none is set. */
+    /** The nickname, else the profile name, else the provider. Null if none is set. */
     val displayName: String?
         get() = listOf(nickname, profileName, providerName)
             .firstOrNull { !it.isNullOrBlank() }?.trim()

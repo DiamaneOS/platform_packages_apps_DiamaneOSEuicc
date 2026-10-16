@@ -8,7 +8,7 @@ object Nickname {
     const val MAX_BYTES = 64
 
     /**
-     * The nickname to store: trimmed; null or blank clears it (empty string). Returns null if
+     * The nickname to store: trimmed. Null or blank clears it (empty string). Returns null if
      * it is longer than 64 UTF-8 bytes or contains control characters.
      */
     fun normalise(input: String?): String? {

@@ -8,9 +8,9 @@
      - Disabled until the user turns on Settings > Network & internet > eSIM support, which
        enables the package and restarts the phone (as GrapheneOS does for Google's LPA).
      - Two privileged permissions, allowlisted in privapp-permissions-de.diamaneos.euicc.xml:
-       WRITE_EMBEDDED_SUBSCRIPTIONS (the framework binds only an LPA that holds it; the screens
+       WRITE_EMBEDDED_SUBSCRIPTIONS (the framework binds only an LPA that holds it, the screens
        use it for refreshes and downloads) and READ_PRIVILEGED_PHONE_STATE (the slot list,
-       which gives the eUICC's card ID; every card command needs it).
+       which gives the eUICC's card ID, and every card command needs it).
      - INTERNET only for SGP.22 downloads, checks, searches and notifications the user starts
        or that follow the user's own change, over HTTPS pinned to the GSMA CI roots
        (network_security_config.xml trusts nothing else). No camera permission: the camera

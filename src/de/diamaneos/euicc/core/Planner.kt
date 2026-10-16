@@ -11,13 +11,13 @@ sealed interface SwitchPlan {
     /** Another profile is enabled and the caller did not allow turning it off. */
     data object MustDeactivate : SwitchPlan
 
-    /** Enable [profile]; the card disables the enabled one itself. */
+    /** Enable [profile]. The card disables the enabled one itself. */
     class Enable(val profile: Profile) : SwitchPlan
 
     /** Disable [profile] and enable nothing. */
     class Disable(val profile: Profile) : SwitchPlan
 
-    /** Not allowed; [result] is the EuiccService result. */
+    /** Not allowed. [result] is the EuiccService result. */
     class Refused(val result: Int) : SwitchPlan
 }
 

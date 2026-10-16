@@ -127,7 +127,7 @@ class ActivationCodeTest {
         assertNull(ConfirmationCode.normalise("12ä4"))
     }
 
-    /** SGP.22 3.1.3: SHA256(SHA256(CC) | TransactionID); expected value from Python's hashlib. */
+    /** SGP.22 3.1.3: SHA256(SHA256(CC) | TransactionID). Expected value from Python's hashlib. */
     @Test
     fun hashesTheConfirmationCode() {
         val transactionId = ByteArray(16) { (it + 1).toByte() }

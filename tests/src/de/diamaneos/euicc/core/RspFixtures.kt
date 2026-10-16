@@ -110,7 +110,7 @@ object Rsp {
         return Der.tlv(NotificationMetadata.TAG, *parts.toTypedArray())
     }
 
-    /** ProfileInstallationResult; [errorReason] null for successResult. */
+    /** ProfileInstallationResult. [errorReason] null for successResult. */
     fun installResult(seq: Int = 7, transactionId: ByteArray = TRANSACTION_ID, errorReason: Int? = null,
                       address: String = "smdp.example.com"): ByteArray {
         val final = if (errorReason == null) {

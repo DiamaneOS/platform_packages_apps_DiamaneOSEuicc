@@ -126,7 +126,7 @@ class EuiccLpaService : EuiccService() {
     override fun onGetDefaultDownloadableSubscriptionList(slotId: Int, forceDeactivateSim: Boolean) =
         GetDefaultDownloadableSubscriptionListResult(Results.NOT_SUPPORTED, null)
 
-    /** Only the download the user started on this app's screen; see RspTasks.serve. */
+    /** Only the download the user started on this app's screen. See RspTasks.serve. */
     override fun onDownloadSubscription(
         slotIndex: Int,
         portIndex: Int,

@@ -10,7 +10,7 @@ import java.nio.charset.CodingErrorAction
 
 /**
  * A BER-TLV element: tag (all tag bytes, big-endian) and value. Enough BER for SGP.22 data
- * (ITU-T X.690 with definite lengths; DER as SGP.22 requires).
+ * (ITU-T X.690 with definite lengths, DER as SGP.22 requires).
  */
 class Tlv(val tag: Int, val value: ByteArray) {
     /** Bit 6 of the first tag byte. */
@@ -47,7 +47,7 @@ class Tlv(val tag: Int, val value: ByteArray) {
         return BitString(value.copyOfRange(1, value.size), unused)
     }
 
-    /** UTF8String contents; malformed UTF-8 is an error. */
+    /** UTF8String contents. Malformed UTF-8 is an error. */
     fun utf8(): String = try {
         Charsets.UTF_8.newDecoder()
             .onMalformedInput(CodingErrorAction.REPORT)
@@ -121,7 +121,7 @@ class Tlv(val tag: Int, val value: ByteArray) {
     }
 }
 
-/** BIT STRING bits; bit 0 is the most significant bit of the first byte (X.690 8.6). */
+/** BIT STRING bits. Bit 0 is the most significant bit of the first byte (X.690 8.6). */
 class BitString(private val bytes: ByteArray, private val unused: Int) {
     val size: Int get() = bytes.size * 8 - unused
 
@@ -194,7 +194,7 @@ object Der {
         return tlv(tag, out.toByteArray())
     }
 
-    /** OBJECT IDENTIFIER contents to dotted form; non-minimal or over-long arcs are errors. */
+    /** OBJECT IDENTIFIER contents to dotted form. Non-minimal or over-long arcs are errors. */
     fun decodeOid(value: ByteArray): String {
         require(value.isNotEmpty() && value.size <= 64) { "bad OID" }
         val arcs = ArrayList<Long>()
@@ -241,7 +241,7 @@ object Der {
     }
 }
 
-/** Lowercase hex, for keys and JSON; never for identifiers in logs. */
+/** Lowercase hex, for keys and JSON. Never for identifiers in logs. */
 object Hex {
     private const val DIGITS = "0123456789abcdef"
 
@@ -254,7 +254,7 @@ object Hex {
         return String(chars)
     }
 
-    /** Even-length hex in either case to bytes; null if malformed. */
+    /** Even-length hex in either case to bytes. Null if malformed. */
     fun decode(text: String): ByteArray? {
         if (text.length % 2 != 0) return null
         val out = ByteArray(text.length / 2)
@@ -270,7 +270,7 @@ object Hex {
 
 /** ITU-T E.118 ICCIDs as SGP.22 encodes them (Iccid, tag '5A'): BCD with swapped nibbles. */
 object Iccid {
-    /** The ICCID digits, trailing 'F' filler removed; null unless it is 18 to 22 digits. */
+    /** The ICCID digits, trailing 'F' filler removed. Null unless it is 18 to 22 digits. */
     fun decode(bytes: ByteArray): String? {
         val digits = StringBuilder(bytes.size * 2)
         var filler = false

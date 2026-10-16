@@ -24,7 +24,7 @@ class OwnedSet(private val salt: ByteArray, hashes: Collection<String>) {
 
     operator fun contains(iccid: String): Boolean = key(iccid) in hashes
 
-    /** Adds [iccid]; the oldest entries go beyond [MAX]. */
+    /** Adds [iccid]. The oldest entries go beyond [MAX]. */
     fun add(iccid: String) {
         hashes.remove(key(iccid))
         hashes.add(key(iccid))
@@ -89,7 +89,7 @@ class NotificationFlow(
                     try {
                         card.removeNotification(n.metadata.seq)
                     } catch (e: CardException) {
-                        // Acknowledged; the eUICC keeps it until a later removal.
+                        // Acknowledged. The eUICC keeps it until a later removal.
                     }
                     if (n.metadata.event == NotificationEvents.DELETE) n.metadata.iccid?.let(forget)
                 }
@@ -115,7 +115,7 @@ class NotificationFlow(
             try {
                 card.removeNotification(seq)
             } catch (e: CardException) {
-                // Acknowledged; the eUICC keeps it until a later removal.
+                // Acknowledged. The eUICC keeps it until a later removal.
             }
             true
         } catch (e: RspException) {

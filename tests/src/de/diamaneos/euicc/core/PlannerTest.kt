@@ -113,7 +113,7 @@ class PlannerTest {
 
     @Test
     fun refusalsAreUserResults() {
-        // EuiccService reserves zero and negative values; errors must be RESULT_FIRST_USER or more.
+        // EuiccService reserves zero and negative values. Errors must be RESULT_FIRST_USER or more.
         for (code in listOf(switchNotFound, switchPolicy, deleteNotFound, deletePolicy)) {
             assertTrue(code >= 1)
         }

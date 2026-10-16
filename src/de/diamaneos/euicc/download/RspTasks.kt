@@ -39,8 +39,8 @@ import java.util.concurrent.locks.ReentrantLock
 
 /**
  * One download, dry run or SM-DS search the user started on this app's screen. The screen
- * shows it; the flow asks it for the confirmation and whether to stop. Survives the screen
- * (rotation, leaving it); the confirmation times out after [CONFIRM_TIMEOUT_MIN] minutes.
+ * shows it. The flow asks it for the confirmation and whether to stop. Survives the screen
+ * (rotation, leaving it). The confirmation times out after [CONFIRM_TIMEOUT_MIN] minutes.
  */
 class RspTask(val kind: Kind, val euicc: Euicc, val host: String, val code: ActivationCode?) : RspUser {
     enum class Kind { DOWNLOAD, CHECK, SEARCH }
@@ -133,9 +133,9 @@ class RspTask(val kind: Kind, val euicc: Euicc, val host: String, val code: Acti
 /**
  * Starts and runs RSP tasks, one at a time, and sends notifications after profile changes.
  * - A download goes through EuiccManager.downloadSubscription, so the framework does its
- *   bookkeeping (refresh, EUICC_PROVISIONED for a later reset); the framework then calls this
+ *   bookkeeping (refresh, EUICC_PROVISIONED for a later reset). The framework then calls this
  *   app's EuiccService, which runs the flow only for the task the user started here ([serve]).
- * - A dry run or a search runs here directly; neither downloads anything.
+ * - A dry run or a search runs here directly. Neither downloads anything.
  * - [cardSession] serialises every RSP session and notification sending: a new
  *   GetEUICCChallenge would end a running session on the eUICC.
  * Logs steps and results only, never a host, code or identifier.
@@ -165,7 +165,7 @@ object RspTasks {
             val intent = Intent(app, DownloadResultReceiver::class.java)
                 .setAction(DownloadResultReceiver.ACTION)
                 .putExtra(DownloadResultReceiver.EXTRA_TOKEN, task.token)
-            // Mutable so the framework can add its result extras; explicit, so nothing else gets it.
+            // Mutable so the framework can add its result extras. Explicit, so nothing else gets it.
             val callback = PendingIntent.getBroadcast(app, 0, intent,
                 PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_UPDATE_CURRENT)
             try {
@@ -244,7 +244,7 @@ object RspTasks {
         return finish(task, outcome)
     }
 
-    /** The framework's result for [token]; settles a task the service never ran. */
+    /** The framework's result for [token]. Settles a task the service never ran. */
     fun onFrameworkResult(token: Long, resultCode: Int, detailedCode: Int) {
         val task = current ?: return
         if (task.token != token || task.outcome != null || task.started) return
@@ -256,8 +256,8 @@ object RspTasks {
 
     /**
      * After a profile change: sends the pending notifications of profiles this app installed
-     * (NotificationFlow), in the background. Waits until the eUICC is back after its restart;
-     * gives up quietly if another session holds the card; the rest stays queued.
+     * (NotificationFlow), in the background. Waits until the eUICC is back after its restart.
+     * Gives up quietly if another session holds the card. The rest stays queued.
      */
     fun sendNotificationsAsync(context: Context, euicc: Euicc) {
         val app = context.applicationContext
@@ -281,7 +281,7 @@ object RspTasks {
         }
     }
 
-    /** The notification flow for the screen's list; call on a worker thread, not during a task. */
+    /** The notification flow for the screen's list. Call on a worker thread, not during a task. */
     fun <T> withNotifications(context: Context, euicc: Euicc, block: (NotificationFlow) -> T): T? {
         val app = context.applicationContext
         if (!cardSession.tryLock(LOCK_WAIT_S, TimeUnit.SECONDS)) return null

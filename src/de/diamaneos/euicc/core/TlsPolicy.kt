@@ -33,7 +33,7 @@ object GsmaCi {
 
     /**
      * The key identifier of a shipped root, if it is a known production CI, self-signed with
-     * that key, a CA and valid now; else null and the root is not used.
+     * that key, a CA and valid now. Else null and the root is not used.
      */
     fun checkRoot(cert: X509Certificate, now: Date = Date()): String? {
         val keyId = Certificates.subjectKeyId(cert)?.let(Hex::encode) ?: return null
@@ -73,11 +73,11 @@ enum class ServerRole(val tlsPolicyOid: String) {
  * TLS server certificate checks for ES9+ and ES11 (SGP.22 4.5.2.1 CERT.DP.TLS / CERT.DS.TLS,
  * 4.5.2.2 verification, 3.1.2 step 5):
  * - the chain validates (RFC 5280 path validation) to one of [anchors], the GSMA CI roots the
- *   eUICC also trusts; no system or user CA is ever consulted;
+ *   eUICC also trusts. No system or user CA is ever consulted.
  * - the certificate is valid now, has extended key usage serverAuth and, if a key usage is
- *   present, digitalSignature;
- * - a Certificate Policies extension, if present, contains the TLS role of [role];
- * - a dNSName in subjectAltName matches the host (wildcards as RFC 6125; the CN is ignored).
+ *   present, digitalSignature.
+ * - a Certificate Policies extension, if present, contains the TLS role of [role].
+ * - a dNSName in subjectAltName matches the host (wildcards as RFC 6125, the CN is ignored).
  * Revocation is not checked: CRLs are optional for the LPA (4.5.2.2) and would mean more
  * connections.
  */
@@ -92,7 +92,7 @@ class TlsPolicy(
 
     fun check(chain: List<X509Certificate>, host: String) {
         if (chain.isEmpty()) throw CertificateException("empty chain")
-        // Servers may send the CI root itself; the root is the anchor, not part of the path.
+        // Servers may send the CI root itself. The root is the anchor, not part of the path.
         val path = chain.filter { cert -> anchors.none { it == cert } }
         if (path.isEmpty() || path[0] != chain[0]) throw CertificateException("no server certificate")
         try {
@@ -126,7 +126,7 @@ class TlsPolicy(
     /**
      * SGP.22 TLS certificates mark extended key usage critical. RFC 5280 path validation does
      * not process it, so some PKIX implementations (older BouncyCastle, which Android uses)
-     * reject the path; checkLeaf checks it instead, as Android's own TrustManagerImpl does.
+     * reject the path. checkLeaf checks it instead, as Android's own TrustManagerImpl does.
      */
     private object ExtendedKeyUsageHandled : PKIXCertPathChecker() {
         override fun init(forward: Boolean) {}

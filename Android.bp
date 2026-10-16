@@ -15,11 +15,11 @@ license {
 // DiamaneOS's eSIM manager (LPA). See README.md.
 //
 // - System API only (EuiccService, EuiccCardManager, EuiccManager, TelephonyManager), no hidden
-//   APIs. SGP.22 downloads use the framework's ES10b card commands; the ES9+ client, its JSON
+//   APIs. SGP.22 downloads use the framework's ES10b card commands. The ES9+ client, its JSON
 //   and ASN.1 parsers and the TLS checks are in src/de/diamaneos/euicc/core and net.
 // - Privileged for its two privileged permissions, with an exact system_ext allowlist.
 // - Signing: no certificate property, so the build signs it with the default application key,
-//   not the platform key. Nothing it uses needs the platform signature or the system UID; it
+//   not the platform key. Nothing it uses needs the platform signature or the system UID. It
 //   runs in the platform's priv_app SELinux domain.
 android_app {
     name: "DiamaneOSEuicc",

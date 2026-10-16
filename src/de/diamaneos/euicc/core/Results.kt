@@ -81,7 +81,7 @@ object Results {
     fun isTransient(code: Int): Boolean =
         code == CARD_EUICC_NOT_FOUND || code == CARD_UNKNOWN_ERROR || code == CARD_TIMEOUT
 
-    /** The EuiccService result for a download outcome; EuiccController passes it to the caller. */
+    /** The EuiccService result for a download outcome. EuiccController passes it to the caller. */
     fun fromOutcome(outcome: Outcome): Int = when (outcome) {
         is Outcome.Installed, is Outcome.Checked, is Outcome.Found -> OK
         Outcome.Cancelled -> error(OPERATION_DOWNLOAD, DETAIL_CANCELLED)

@@ -64,13 +64,13 @@ class CardClient(context: Context) {
     fun euiccInfo2(euicc: Euicc): CardResult<ByteArray> =
         call(READ_TIMEOUT_S) { m, cb -> m.requestEuiccInfo2(euicc.cardId, DIRECT, cb) }
 
-    /** Enables a profile on a port; the card disables the enabled one and restarts. */
+    /** Enables a profile on a port. The card disables the enabled one and restarts. */
     fun enable(euicc: Euicc, iccid: String, port: Int): Int =
         call<EuiccProfileInfo>(WRITE_TIMEOUT_S) { m, cb ->
             m.switchToProfile(euicc.cardId, iccid, port, true /* refresh */, DIRECT, cb)
         }.code
 
-    /** Disables an enabled profile; the card restarts. */
+    /** Disables an enabled profile. The card restarts. */
     fun disable(euicc: Euicc, iccid: String): Int =
         call<Void>(WRITE_TIMEOUT_S) { m, cb ->
             m.disableProfile(euicc.cardId, iccid, true /* refresh */, DIRECT, cb)
@@ -158,7 +158,7 @@ class CardClient(context: Context) {
     /**
      * Runs one EuiccCardManager call and waits for its callback. A missing manager, an
      * exception (no eUICC feature, a security exception) or no answer within the timeout give
-     * an error code; a callback after the timeout is dropped.
+     * an error code. A callback after the timeout is dropped.
      */
     private fun <T> call(
         timeoutS: Long,

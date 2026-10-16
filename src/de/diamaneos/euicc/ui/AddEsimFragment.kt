@@ -47,11 +47,11 @@ import java.util.concurrent.Executors
 
 /**
  * Add an eSIM: scan (the camera app's QR scanner, then "Open with" or paste), paste or type an
- * activation code, or search the eUICC's discovery server; or check a code without using it.
+ * activation code, or search the eUICC's discovery server. Or check a code without using it.
  * - Nothing contacts a server before the user agrees on a dialog that names the server and
  *   what it receives.
  * - The profile's details are confirmed (with the confirmation code if one is required)
- *   before anything is downloaded; "Not now" and Stop keep the code usable.
+ *   before anything is downloaded. "Not now" and Stop keep the code usable.
  * - No camera permission: QR codes are read by the camera app, then opened with Add eSIM or
  *   pasted (README, "QR codes").
  */
@@ -150,7 +150,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
 
     /**
      * The phone's QR scanner, which SystemUI's QR tile also opens (the camera app's QR mode),
-     * or else the camera. The scanned code's "Open with" brings it back here; a copied code is
+     * or else the camera. The scanned code's "Open with" brings it back here. A copied code is
      * pasted on return.
      */
     private fun scan() {
@@ -196,7 +196,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
         }
     }
 
-    /** The SM-DP+ address and activation code as carriers print them; a whole code also works. */
+    /** The SM-DP+ address and activation code as carriers print them. A whole code also works. */
     private fun manual() {
         val context = requireContext()
         val address = field(context, R.string.manual_address, InputType.TYPE_TEXT_VARIATION_URI)
@@ -484,7 +484,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
         }
     }
 
-    /** SGP.22 5.2.6 subject codes of the common refusals; the codes themselves are public. */
+    /** SGP.22 5.2.6 subject codes of the common refusals. The codes themselves are public. */
     private fun serverRefused(host: String, e: RspException): String {
         val codes = getString(R.string.fail_codes, e.subjectCode ?: "?", e.reasonCode ?: "?")
         val reason = when {

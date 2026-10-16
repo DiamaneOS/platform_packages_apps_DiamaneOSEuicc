@@ -10,7 +10,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** A scripted eUICC: records the commands; [fail] makes one throw a CardException. */
+/** A scripted eUICC: records the commands. [fail] makes one throw a CardException. */
 class FakeCard : RspCard {
     val calls = mutableListOf<String>()
     var info1 = Rsp.euiccInfo1()

@@ -219,7 +219,7 @@ class PendingNotification(val raw: ByteArray, val metadata: NotificationMetadata
     }
 }
 
-/** Card responses the framework returns whole; the download checks their shape. */
+/** Card responses the framework returns whole. The download checks their shape. */
 object CardResponses {
     /** AuthenticateServerResponse (5.7.13) is authenticateResponseOk [0] for [transactionId]. */
     fun authenticateServerOk(data: ByteArray, transactionId: ByteArray): Boolean = check {

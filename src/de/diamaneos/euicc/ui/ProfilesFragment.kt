@@ -40,7 +40,7 @@ import java.util.concurrent.Executors
  * The profiles on the eUICC: "Add eSIM", the EID (hidden until tapped), then one row per
  * profile. A row offers turn on or off, rename and delete, each confirmed. Below, the carrier
  * notifications the eUICC still holds, to send (profiles added here) or remove. Card calls run
- * on a worker thread; nothing is logged.
+ * on a worker thread. Nothing is logged.
  */
 class ProfilesFragment : SettingsBasePreferenceFragment() {
     private val worker = Executors.newSingleThreadExecutor()
@@ -292,7 +292,7 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
 
     /**
      * The eUICC's pending notifications (SGP.22 3.5): event and server only. Those of profiles
-     * added here can be sent; any can be removed. Sending happens on its own after changes.
+     * added here can be sent. Any can be removed. Sending happens on its own after changes.
      */
     private fun showNotifications() {
         val entries = pendingNotifications

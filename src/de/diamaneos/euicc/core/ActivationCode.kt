@@ -11,15 +11,15 @@ import java.security.MessageDigest
  * toString() never prints the matching ID.
  */
 class ActivationCode(
-    /** Lowercase FQDN; the only host the download contacts. */
+    /** Lowercase FQDN. The only host the download contacts. */
     val smdpAddress: String,
-    /** AC_Token (MatchingID, 4.1.1); may be empty. Secret until used: never logged. */
+    /** AC_Token (MatchingID, 4.1.1). May be empty. Secret until used: never logged. */
     val matchingId: String,
     /** SM-DP+ OID that CERT.DPauth.ECDSA must carry, if the code names one. */
     val smdpOid: String?,
     val confirmationCodeRequired: Boolean,
 ) {
-    /** The code in its canonical form, without "LPA:"; the key that pairs a download with its consent. */
+    /** The code in its canonical form, without "LPA:". The key that pairs a download with its consent. */
     fun encoded(): String = buildString {
         append("1$").append(smdpAddress).append('$').append(matchingId)
         if (smdpOid != null || confirmationCodeRequired) append('$').append(smdpOid.orEmpty())
@@ -28,7 +28,7 @@ class ActivationCode(
 
     override fun toString() = "ActivationCode(oid=${smdpOid != null}, cc=$confirmationCodeRequired)"
 
-    /** Why a code was refused. Shown to the user; never contains the input. */
+    /** Why a code was refused. Shown to the user. Never contains the input. */
     enum class Problem { FORMAT, VERSION, ADDRESS, TOKEN, OID, FLAG, TOO_LONG }
 
     class Invalid(val problem: Problem) : Exception(problem.name)
@@ -81,7 +81,7 @@ class ActivationCode(
 object Fqdn {
     private val LABEL = Regex("[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?")
 
-    /** Lowercase [input] if it is a fully qualified LDH host name of two or more labels; else null. */
+    /** Lowercase [input] if it is a fully qualified LDH host name of two or more labels. Else null. */
     fun normalise(input: String): String? {
         val host = input.lowercase(java.util.Locale.ROOT)
         if (host.isEmpty() || host.length > 253) return null
@@ -112,7 +112,7 @@ object Fqdn {
 object ConfirmationCode {
     const val MAX_LENGTH = 32
 
-    /** The code to hash: trimmed, 1 to 32 visible ASCII characters; null if not acceptable. */
+    /** The code to hash: trimmed, 1 to 32 visible ASCII characters. Null if not acceptable. */
     fun normalise(input: String?): String? {
         val code = input?.trim() ?: return null
         if (code.isEmpty() || code.length > MAX_LENGTH) return null

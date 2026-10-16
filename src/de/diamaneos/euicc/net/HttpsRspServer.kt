@@ -39,14 +39,14 @@ class PinnedServers(private val roots: Map<String, X509Certificate>) : RspServer
 
 /**
  * ES9+ and ES11 with one RSP server (SGP.22 6.1 to 6.5):
- * - HTTPS to [host] port 443 only; [host] is a validated FQDN from the code, the SM-DS or a
+ * - HTTPS to [host] port 443 only. [host] is a validated FQDN from the code, the SM-DS or a
  *   notification. Redirects are never followed: any other status than the function's fails.
  * - The TLS certificate is checked by [policy] against the GSMA CI anchors only, inside the
- *   handshake; the host name check is repeated after it.
+ *   handshake. The host name check is repeated after it.
  * - A fresh SSLContext per server object, so no TLS session is resumed across RSP sessions
- *   (3.1.2 step 5); "Connection: close", so no request is replayed on a reused connection.
- * - Timeouts on connect and every read; response bodies are size-limited and parsed strictly.
- * - No cookies, no cache, no compression; nothing is logged.
+ *   (3.1.2 step 5). "Connection: close", so no request is replayed on a reused connection.
+ * - Timeouts on connect and every read. Response bodies are size-limited and parsed strictly.
+ * - No cookies, no cache, no compression. Nothing is logged.
  */
 class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : RspServer {
     private val context: SSLContext = SSLContext.getInstance("TLS").apply {
@@ -137,7 +137,7 @@ class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : 
         }
     }
 
-    /** The trust manager checked the host already; check the session's leaf again. */
+    /** The trust manager checked the host already. Check the session's leaf again. */
     private fun verifyAgain(name: String, session: SSLSession): Boolean {
         if (!name.equals(host, ignoreCase = true)) return false
         return try {

@@ -199,7 +199,7 @@ object Json {
                     c == '\\' -> escape(out)
                     c.code < 0x20 -> fail("control character in string")
                     Character.isSurrogate(c) -> {
-                        // A pair arrives as two chars; a lone surrogate cannot come from UTF-8,
+                        // A pair arrives as two chars. A lone surrogate cannot come from UTF-8,
                         // but check anyway.
                         if (!Character.isHighSurrogate(c) || pos >= s.length || !Character.isLowSurrogate(s[pos])) {
                             fail("lone surrogate")

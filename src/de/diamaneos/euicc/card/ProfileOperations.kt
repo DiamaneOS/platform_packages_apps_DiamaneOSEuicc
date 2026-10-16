@@ -14,7 +14,7 @@ import de.diamaneos.euicc.core.SwitchPlan
 
 /**
  * Profile changes, shared by the EuiccService and the screen. Each reads the card's current
- * list, plans the change, then runs it; one change at a time in this process. Returns
+ * list, plans the change, then runs it. One change at a time in this process. Returns
  * EuiccService result codes. Logs result codes only. [changed] runs after every successful
  * enable, disable or delete (the eUICC may have queued notifications).
  */
@@ -75,7 +75,7 @@ class ProfileOperations(
         }
     }
 
-    /** ES10c eUICCMemoryReset; [options] are EuiccCardManager.RESET_OPTION_* bits. */
+    /** ES10c eUICCMemoryReset. [options] are EuiccCardManager.RESET_OPTION_* bits. */
     fun erase(euicc: Euicc, options: Int): Int = synchronized(LOCK) {
         val result = Results.fromCard(client.resetMemory(euicc, options))
         Log.i(TAG, "erase: options=$options result=$result")

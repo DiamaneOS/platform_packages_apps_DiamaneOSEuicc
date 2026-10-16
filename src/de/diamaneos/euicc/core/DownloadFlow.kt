@@ -20,13 +20,13 @@ interface RspCard {
     /** GetEUICCChallenge (5.7.7): 16 bytes. Starts a new RSP session on the eUICC. */
     fun euiccChallenge(): ByteArray
 
-    /** AuthenticateServer (5.7.13); the framework adds ctxParams1 with [matchingId] and DeviceInfo. */
+    /** AuthenticateServer (5.7.13). The framework adds ctxParams1 with [matchingId] and DeviceInfo. */
     fun authenticateServer(matchingId: String, auth: Es9.InitiateAuthentication): ByteArray
 
     /** PrepareDownload (5.7.5). */
     fun prepareDownload(hashCc: ByteArray?, client: Es9.AuthenticateClient): ByteArray
 
-    /** LoadBoundProfilePackage (5.7.6); the framework segments the package (2.5.5). */
+    /** LoadBoundProfilePackage (5.7.6). The framework segments the package (2.5.5). */
     fun loadBoundProfilePackage(bpp: ByteArray): ByteArray
 
     /** CancelSession (5.7.14): the signed CancelSessionResponse. */
@@ -75,7 +75,7 @@ class ConfirmRequest(
 )
 
 sealed interface Confirmation {
-    /** Go ahead; [confirmationCode] when one was asked for. */
+    /** Go ahead. [confirmationCode] when one was asked for. */
     class Accept(val confirmationCode: String?) : Confirmation
 
     /** Not now (CancelSession reason postponed: the code stays usable). */
@@ -84,12 +84,12 @@ sealed interface Confirmation {
 
 /** The user's side of an RSP session. */
 interface RspUser {
-    /** Checked between steps; a cancel before the package download keeps the code usable. */
+    /** Checked between steps. A cancel before the package download keeps the code usable. */
     val cancelled: Boolean
 
     fun step(step: Step) {}
 
-    /** Asks for the confirmation; null if there was no answer in time. */
+    /** Asks for the confirmation. Null if there was no answer in time. */
     fun confirm(request: ConfirmRequest): Confirmation?
 }
 
@@ -115,11 +115,11 @@ sealed interface Outcome {
  * One SGP.22 consumer RSP session (v2.5 sections 3.1.2 and 3.1.3), on [card] with servers from
  * [servers]. Rules:
  * - Before ES9+.AuthenticateClient the server has not seen the MatchingID, so stopping there
- *   costs nothing; the dry run and discovery never get further.
+ *   costs nothing. The dry run and discovery never get further.
  * - Every stop after AuthenticateClient and before GetBoundProfilePackage cancels the session on
  *   the eUICC and the server with reason "postponed" (or "timeout" when the user did not
  *   answer), the only reasons that keep the operator's order usable (5.7.14).
- * - After GetBoundProfilePackage the package is installed; the eUICC's install result goes to
+ * - After GetBoundProfilePackage the package is installed. The eUICC's install result goes to
  *   the address in it.
  * [installed] records the ICCID of a profile this app installed, before its notification.
  */
@@ -149,7 +149,7 @@ class DownloadFlow(
         val client = try {
             session.server.authenticateClient(session.transactionId, session.authenticateServerResponse)
         } catch (e: RspException) {
-            // A refusal ends the server's session; after a lost answer it may still be open.
+            // A refusal ends the server's session. After a lost answer it may still be open.
             return@guarded if (e.failure == Failure.SERVER_REFUSED) cancelOnCard(session, Outcome.Failed(e))
             else cancelBoth(session, Outcome.Failed(e))
         }
@@ -211,7 +211,7 @@ class DownloadFlow(
         val (bppTransaction, bpp) = try {
             session.server.getBoundProfilePackage(session.transactionId, prepared)
         } catch (e: RspException) {
-            // A refusal here is final for this session (e.g. a wrong confirmation code; 3.1.3.2).
+            // A refusal here is final for this session (e.g. a wrong confirmation code, 3.1.3.2).
             return@guarded if (e.failure == Failure.SERVER_REFUSED) cancelOnCard(session, Outcome.Failed(e))
             else cancelBoth(session, Outcome.Failed(e))
         }
@@ -243,7 +243,7 @@ class DownloadFlow(
 
     /**
      * Dry run: TLS to [code]'s SM-DP+, ES9+.InitiateAuthentication, the address, challenge and
-     * OID checks, and the eUICC's AuthenticateServer with an empty MatchingID; then the eUICC
+     * OID checks, and the eUICC's AuthenticateServer with an empty MatchingID. Then the eUICC
      * session is cancelled. The server never sees the MatchingID: the code is not used.
      */
     fun check(code: ActivationCode): Outcome = guarded {
@@ -338,7 +338,7 @@ class DownloadFlow(
         } catch (e: RspException) {
             false
         } catch (e: CardException) {
-            true // sent; the eUICC keeps it until a later removal
+            true // sent. The eUICC keeps it until a later removal
         }
     }
 

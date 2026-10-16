@@ -16,7 +16,7 @@ import de.diamaneos.euicc.core.RspCard
 
 /**
  * The RSP card commands on one eUICC, through EuiccCardManager. A failed call throws
- * [CardException] with the framework's result code; nothing is logged here.
+ * [CardException] with the framework's result code. Nothing is logged here.
  */
 class RspCardAdapter(private val client: CardClient, private val euicc: Euicc) : RspCard {
 

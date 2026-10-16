@@ -31,7 +31,7 @@ class OpenCodeActivity : Activity() {
     }
 
     private companion object {
-        /** Far above any valid code (ActivationCode.MAX_LENGTH); Add eSIM rejects the rest. */
+        /** Far above any valid code (ActivationCode.MAX_LENGTH). Add eSIM rejects the rest. */
         const val MAX_INPUT = 1024
     }
 }

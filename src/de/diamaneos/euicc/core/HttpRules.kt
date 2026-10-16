@@ -8,7 +8,7 @@ import java.io.InputStream
 
 /** HTTP response rules for ES9+ and ES11 (SGP.22 6.2, 6.3), apart from the connection. */
 object HttpRules {
-    /** Request-response functions answer 200 with JSON; anything else fails, redirects too. */
+    /** Request-response functions answer 200 with JSON. Anything else fails, redirects too. */
     fun checkJsonResponse(status: Int, contentType: String?, contentLength: Long, max: Int) {
         if (status != 200) throw RspException(Failure.HTTP_STATUS)
         val type = contentType?.substringBefore(';')?.trim()
@@ -16,12 +16,12 @@ object HttpRules {
         if (contentLength > max) throw RspException(Failure.INVALID_RESPONSE)
     }
 
-    /** Notifications answer 204 with an empty body (6.3); 200 is tolerated, its body ignored. */
+    /** Notifications answer 204 with an empty body (6.3). 200 is tolerated, its body ignored. */
     fun checkNotificationResponse(status: Int) {
         if (status != 204 && status != 200) throw RspException(Failure.HTTP_STATUS)
     }
 
-    /** Reads at most [max] bytes; more is INVALID_RESPONSE. */
+    /** Reads at most [max] bytes. More is INVALID_RESPONSE. */
     fun readBounded(input: InputStream, max: Int): ByteArray {
         val out = ByteArrayOutputStream(minOf(max, 16 * 1024))
         val buffer = ByteArray(8192)
