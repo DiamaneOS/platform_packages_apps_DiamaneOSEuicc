@@ -6,8 +6,8 @@ package de.diamaneos.euicc.core
 /**
  * The profiles on one eUICC, in the card's order.
  *
- * Only one profile is enabled at a time: the FP6's eUICC has one port and no multiple enabled
- * profiles (MEP), and the framework reports it that way.
+ * Only one profile is enabled at a time: the app supports eUICCs with one port and no multiple
+ * enabled profiles (MEP), as the framework reports them.
  */
 class ProfileList(val profiles: List<Profile>, val skipped: Int) {
     val enabled: Profile? get() = profiles.firstOrNull { it.isEnabled }
@@ -22,7 +22,7 @@ class ProfileList(val profiles: List<Profile>, val skipped: Int) {
     val visible: List<Profile>
         get() = profiles.filter { it.profileClass != ProfileClass.TESTING || it.isEnabled }
 
-    /** The visible profiles: enabled first, then by name; profiles without a name last. */
+    /** The visible profiles: enabled first, then by name. Profiles without a name last. */
     fun forDisplay(): List<Profile> = visible.sortedWith(
         compareByDescending<Profile> { it.isEnabled }
             .thenBy { it.displayName == null }
