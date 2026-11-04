@@ -73,9 +73,11 @@ class FakeServer(private val host: String = "smdp.example.com") : RspServer {
     val refuse = mutableSetOf<String>()
     val drop = mutableSetOf<String>()
     val notified = mutableListOf<ByteArray>()
+    var onCall: (String) -> Unit = {}
 
     private fun call(name: String) {
         calls += name
+        onCall(name)
         if (name in refuse) throw RspException(Failure.SERVER_REFUSED, subjectCode = "8.2.6", reasonCode = "3.8")
         if (name in drop) throw RspException(Failure.NETWORK)
     }
@@ -313,6 +315,87 @@ class DownloadFlowTest {
         val server4 = FakeServer().apply { bpp = Rsp.boundProfilePackage(Rsp.metadata(ppr = intArrayOf(2))) }
         assertEquals(Failure.PPR_NOT_ALLOWED, failure(DownloadFlow(card4, FakeServers("smdp.example.com" to server4), FakeUser()).download(code)))
         assertFalse("load" in card4.calls)
+    }
+
+    /** A rogue server shows one profile and sends one that can do more: nothing reaches the eUICC. */
+    @Test
+    fun packageMustNotGoBeyondWhatTheUserAgreedTo() {
+        val other = Rsp.ICCID_A_BYTES.copyOf().also { it[0] = 0x99.toByte() }
+        val rules = Rsp.metadata(ppr = intArrayOf(2))
+        for ((shown, sent, field) in listOf(
+            Triple(Rsp.metadata(), Rsp.metadata(profileClass = ProfileMetadata.CLASS_TEST), "class"),
+            Triple(Rsp.metadata(), Rsp.metadata(notified = intArrayOf(0, 1, 3)), "events"),
+            Triple(rules, Rsp.metadata(ppr = intArrayOf(2), owner = true), "owner"),
+            Triple(Rsp.metadata(), Rsp.metadata(iccid = other), "iccid"),
+        )) {
+            val card = FakeCard()
+            val server = FakeServer().apply {
+                client = Rsp.authenticateClient(metadata = shown)
+                bpp = Rsp.boundProfilePackage(sent)
+            }
+            val outcome = DownloadFlow(card, FakeServers("smdp.example.com" to server), FakeUser()).download(code) as Outcome.Failed
+            assertEquals(Failure.SERVER_MISMATCH, outcome.failure)
+            assertEquals(field, outcome.error.field)
+            assertFalse("load" in card.calls)
+            assertEquals("cancelSession", server.calls.last())
+        }
+    }
+
+    /** Other labels change nothing the profile can do: installed, and the result has the package's. */
+    @Test
+    fun aPackageWithOtherLabelsInstallsUnderItsOwn() {
+        server.bpp = Rsp.boundProfilePackage(Rsp.metadata(name = "Other", provider = "Else"))
+        val outcome = flow.download(code) as Outcome.Installed
+        assertEquals("Other", outcome.metadata.profileName)
+        assertEquals("Else", outcome.metadata.serviceProviderName)
+        assertEquals(listOf("name", "provider"), outcome.labelChanges)
+        assertEquals("Travel 5 GB", user.request!!.metadata.profileName)
+
+        for (same in listOf(
+            Rsp.metadata(profileClass = ProfileMetadata.CLASS_OPERATIONAL),
+            Rsp.metadata(iccid = null),
+            Rsp.metadata(notified = intArrayOf(0)),
+            Rsp.metadata(owner = true),
+        )) {
+            val quiet = FakeServer().apply { bpp = Rsp.boundProfilePackage(same) }
+            val installed = DownloadFlow(FakeCard(), FakeServers("smdp.example.com" to quiet), FakeUser()).download(code) as Outcome.Installed
+            assertTrue(installed.labelChanges.isEmpty())
+        }
+    }
+
+    @Test
+    fun aPackageThatDoesNotParseIsNotInstalled() {
+        for (broken in listOf(
+            Der.tlv(0xBF36, Der.tlv(0xA3, Der.tlv(0x86, ByteArray(40)))),
+            Rsp.boundProfilePackage(Der.tlv(0x30, ByteArray(40))),
+        )) {
+            val card = FakeCard()
+            val server = FakeServer().apply { bpp = broken }
+            assertEquals(Failure.INVALID_RESPONSE, failure(DownloadFlow(card, FakeServers("smdp.example.com" to server), FakeUser()).download(code)))
+            assertFalse("load" in card.calls)
+            assertEquals("cancelSession", server.calls.last())
+        }
+    }
+
+    /** Stop closes a running request's connection: the user sees a stop, not a network failure. */
+    @Test
+    fun aStopThatEndsARequestIsNotAFailure() {
+        val stopped = FakeUser()
+        val first = FakeServer().apply {
+            drop += "initiate"
+            onCall = { stopped.cancelled = true }
+        }
+        assertEquals(Outcome.Cancelled, DownloadFlow(FakeCard(), FakeServers("smdp.example.com" to first), stopped).download(code))
+
+        val stopped2 = FakeUser()
+        val second = FakeServer().apply {
+            drop += "authenticateClient"
+            onCall = { if (it == "authenticateClient") stopped2.cancelled = true }
+        }
+        val card2 = FakeCard()
+        assertEquals(Outcome.Cancelled, DownloadFlow(card2, FakeServers("smdp.example.com" to second), stopped2).download(code))
+        assertEquals(listOf("initiate", "authenticateClient", "cancelSession"), second.calls)
+        assertEquals(listOf(CancelReason.POSTPONED), card2.cancelReasons)
     }
 
     @Test

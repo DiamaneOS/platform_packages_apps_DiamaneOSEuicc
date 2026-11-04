@@ -47,7 +47,13 @@ consumer devices).
   challenge and the address the code names, and it uses a CI the eUICC signs
   with.
 - The profile's provider, name, class, policy rules and notification events
-  are shown before the download.
+  are shown before the download, in a dialog that scrolls. Server text is
+  shown without control, format or invisible characters.
+- The package must keep the class, policy rules and owner, add no notification
+  events, and keep the ICCID if both name one, or it is not installed. A
+  package whose details can't be read isn't either. A different provider or
+  name is installed, logged by field name only, and the result shows the
+  package's own.
 - The confirmation code prompt appears when the code or the server asks for
   one (hashed as 3.1.3 requires).
 - Never turns the new profile on. That is a separate choice in the list.
@@ -67,7 +73,8 @@ consumer devices).
 
 - HTTPS POST to the SM-DP+ or SM-DS host from the code, the search or a
   notification only: port 443, no redirects, timeouts on connect and every
-  read, a fresh TLS context per session, no cookies, cache or compression.
+  read, an overall deadline per request that closes the socket, a fresh TLS
+  context per session, no cookies, cache or compression.
 - Trust anchors: only the GSMA production CI roots in `res/raw` whose key
   identifier the eUICC lists for verification (EUICCInfo1).
 - Never system or user CAs, never a test CI (SGP.26 publishes their keys).
@@ -167,6 +174,7 @@ consumer devices).
   - BER and DER, the SGP.22 objects, strict JSON and the ES9+ messages
   - TLS pinning with synthetic and recorded certificates
   - the download and notification flows with a scripted eUICC and server
+  - server text cleaning, and the request deadline on a local socket
 - A device adds `DiamaneOSEuicc` to `PRODUCT_PACKAGES` and lists its built-in
   eUICC slots in the framework overlay (`non_removable_euicc_slots`).
 

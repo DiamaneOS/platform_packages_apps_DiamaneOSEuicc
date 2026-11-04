@@ -57,6 +57,9 @@ class SmdpSigned2(val transactionId: ByteArray, val ccRequired: Boolean) {
 
 /** OperatorId (2.9.2, "Data type: OperatorId"): the Profile Owner, as the RAT compares it. */
 class OperatorId(val mccMnc: ByteArray, val gid1: ByteArray?, val gid2: ByteArray?) {
+    fun sameAs(other: OperatorId?) = other != null && mccMnc.contentEquals(other.mccMnc) &&
+        gid1.contentEquals(other.gid1) && gid2.contentEquals(other.gid2)
+
     override fun toString() = "OperatorId"
 }
 
@@ -80,6 +83,27 @@ class ProfileMetadata(
 
     /** The rules as EuiccProfileInfo.POLICY_RULE_* bits (DO_NOT_DISABLE 1, DO_NOT_DELETE 2). */
     val policyRules: Int get() = (if (ppr1) 1 else 0) or (if (ppr2) 2 else 0)
+
+    /**
+     * The first field of [packaged] that goes beyond what the user agreed to, by name only: fewer
+     * notified events are fine, the owner counts only for rules (the RAT check used this one),
+     * and the ICCID only if both have one.
+     */
+    fun refusedChange(packaged: ProfileMetadata): String? = when {
+        profileClass != packaged.profileClass -> "class"
+        ppr != packaged.ppr -> "rules"
+        packaged.notifiedEvents and notifiedEvents.inv() != 0 -> "events"
+        policyRules != 0 && (owner == null) != (packaged.owner == null) -> "owner"
+        policyRules != 0 && owner?.sameAs(packaged.owner) == false -> "owner"
+        iccid != null && packaged.iccid != null && iccid != packaged.iccid -> "iccid"
+        else -> null
+    }
+
+    /** The labels [packaged] changes, by name only. They change nothing the profile can do. */
+    fun labelChanges(packaged: ProfileMetadata): List<String> = listOfNotNull(
+        "name".takeIf { profileName != packaged.profileName },
+        "provider".takeIf { serviceProviderName != packaged.serviceProviderName },
+    )
 
     override fun toString() = "ProfileMetadata(class=$profileClass, ppr=$ppr, notified=$notifiedEvents)"
 

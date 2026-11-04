@@ -68,6 +68,8 @@ class RspException(
     val cardCode: Int? = null,
     val subjectCode: String? = null,
     val reasonCode: String? = null,
+    /** The name of the metadata field that differs, for the log. Never its value. */
+    val field: String? = null,
     cause: Throwable? = null,
 ) : Exception(failure.name, cause)
 

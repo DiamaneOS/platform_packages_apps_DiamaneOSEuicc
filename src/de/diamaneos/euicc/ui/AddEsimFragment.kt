@@ -22,6 +22,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.preference.Preference
@@ -40,6 +41,7 @@ import de.diamaneos.euicc.core.NotificationEvents
 import de.diamaneos.euicc.core.Outcome
 import de.diamaneos.euicc.core.ProfileMetadata
 import de.diamaneos.euicc.core.RspException
+import de.diamaneos.euicc.core.ServerText
 import de.diamaneos.euicc.core.Step
 import de.diamaneos.euicc.download.RspTask
 import de.diamaneos.euicc.download.RspTasks
@@ -367,7 +369,10 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
         }
         val dialog = AlertDialog.Builder(context)
             .setTitle(getString(R.string.confirm_title, name(metadata)))
-            .setView(if (code != null) column(context, message, code) else column(context, message))
+            .setView(ScrollView(context).apply {
+                isScrollbarFadingEnabled = false
+                addView(if (code != null) column(context, message, code) else column(context, message))
+            })
             .setPositiveButton(R.string.confirm_download) { _, _ ->
                 task.answer(Confirmation.Accept(code?.text?.toString()))
             }
@@ -395,8 +400,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
     private fun describe(request: ConfirmRequest): String {
         val m = request.metadata
         val lines = mutableListOf(getString(R.string.confirm_from, request.host))
-        if (m.serviceProviderName.isNotBlank()) lines += getString(R.string.confirm_provider, m.serviceProviderName.trim())
-        if (m.profileName.isNotBlank()) lines += getString(R.string.confirm_name, m.profileName.trim())
+        lines += labels(m)
         when (m.profileClass) {
             ProfileMetadata.CLASS_TEST -> lines += getString(R.string.class_testing)
             ProfileMetadata.CLASS_PROVISIONING -> lines += getString(R.string.class_provisioning)
@@ -414,8 +418,13 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
         return lines.joinToString("\n\n")
     }
 
+    private fun labels(m: ProfileMetadata): List<String> = listOfNotNull(
+        ServerText.clean(m.serviceProviderName).takeIf { it.isNotEmpty() }?.let { getString(R.string.confirm_provider, it) },
+        ServerText.clean(m.profileName).takeIf { it.isNotEmpty() }?.let { getString(R.string.confirm_name, it) },
+    )
+
     private fun name(metadata: ProfileMetadata): String = listOf(metadata.profileName, metadata.serviceProviderName)
-        .firstOrNull { it.isNotBlank() }?.trim() ?: getString(R.string.unnamed_profile)
+        .map { ServerText.clean(it) }.firstOrNull { it.isNotEmpty() } ?: getString(R.string.unnamed_profile)
 
     private fun showOutcome(task: RspTask, outcome: Outcome) {
         confirmDialog?.dismiss()
@@ -436,8 +445,9 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
             return
         }
         val (title, text) = when (outcome) {
-            is Outcome.Installed -> getString(R.string.done_title) to
-                getString(if (outcome.notified) R.string.done_text else R.string.done_text_unsent)
+            // What the package named, which a server can make differ from the confirmation.
+            is Outcome.Installed -> getString(R.string.done_title) to (labels(outcome.metadata) +
+                getString(if (outcome.notified) R.string.done_text else R.string.done_text_unsent)).joinToString("\n\n")
             is Outcome.Checked -> getString(R.string.checked_title) to
                 getString(R.string.checked_text, task.host, outcome.serverCi, outcome.svn.toString())
             is Outcome.Found -> getString(R.string.search_none_title) to getString(R.string.search_none_text)

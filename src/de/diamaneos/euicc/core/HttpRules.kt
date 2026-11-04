@@ -5,6 +5,8 @@ package de.diamaneos.euicc.core
 
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /** HTTP response rules for ES9+ and ES11 (SGP.22 6.2, 6.3), apart from the connection. */
 object HttpRules {
@@ -32,5 +34,39 @@ object HttpRules {
             out.write(buffer, 0, n)
         }
         return out.toByteArray()
+    }
+}
+
+/**
+ * Ends one request at its overall deadline, or as soon as [stopped], by calling [abort] from
+ * another thread. Per-read timeouts do not bound a server that sends one byte at a time. [abort]
+ * runs on every poll until [close], because a connection still being opened can ignore it.
+ */
+class RequestWatch(deadlineMs: Long, stopped: () -> Boolean, abort: () -> Unit) : AutoCloseable {
+    private val done = CountDownLatch(1)
+
+    /** The request was ended here, so its failure says nothing about the server's certificate. */
+    @Volatile var fired = false
+        private set
+
+    init {
+        val end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(deadlineMs)
+        Thread({
+            while (!done.await(POLL_MS, TimeUnit.MILLISECONDS)) {
+                if (System.nanoTime() - end >= 0 || stopped()) {
+                    fired = true
+                    abort()
+                }
+            }
+        }, "rsp-request-watch").apply {
+            isDaemon = true
+            start()
+        }
+    }
+
+    override fun close() = done.countDown()
+
+    private companion object {
+        const val POLL_MS = 200L
     }
 }

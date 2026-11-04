@@ -71,12 +71,13 @@ object Rsp {
         ppr: IntArray = intArrayOf(),
         notified: IntArray = intArrayOf(0, 3),
         owner: Boolean = false,
+        iccid: ByteArray? = ICCID_A_BYTES,
     ): ByteArray {
         val parts = mutableListOf(
-            Der.tlv(0x5A, ICCID_A_BYTES),
             Der.utf8(provider, 0x91),
             Der.utf8(name, 0x92),
         )
+        if (iccid != null) parts.add(0, Der.tlv(0x5A, iccid))
         if (profileClass != null) parts += Der.int(profileClass, 0x95)
         if (notified.isNotEmpty()) {
             parts += Der.tlv(0xB6, Der.tlv(0x30, Der.bits(4, *notified, tag = 0x80), Der.utf8("smdp.example.com", 0x81)))

@@ -28,6 +28,7 @@ import de.diamaneos.euicc.card.Profiles
 import de.diamaneos.euicc.core.NotificationEvents
 import de.diamaneos.euicc.core.NotificationFlow
 import de.diamaneos.euicc.core.Nickname
+import de.diamaneos.euicc.core.ServerText
 import de.diamaneos.euicc.core.Profile
 import de.diamaneos.euicc.core.ProfileClass
 import de.diamaneos.euicc.core.ProfileList
@@ -181,8 +182,8 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
 
     private fun summary(profile: Profile): String {
         val parts = mutableListOf(getString(if (profile.isEnabled) R.string.state_on else R.string.state_off))
-        val provider = profile.providerName?.trim()
-        if (!provider.isNullOrEmpty() && provider != profile.displayName) parts += provider
+        val provider = ServerText.clean(profile.providerName)
+        if (provider.isNotEmpty() && provider != profile.displayName) parts += provider
         when (profile.profileClass) {
             ProfileClass.TESTING -> parts += getString(R.string.class_testing)
             ProfileClass.PROVISIONING -> parts += getString(R.string.class_provisioning)
@@ -303,7 +304,7 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
         val entries = pendingNotifications
         if (entries.isEmpty()) return
         val labels = entries.map { n ->
-            getString(R.string.notification_item, eventName(n.event), n.address) +
+            getString(R.string.notification_item, eventName(n.event), ServerText.clean(n.address, ServerText.MAX_ADDRESS_CHARS)) +
                 if (n.ours) "\n" + getString(R.string.notification_ours) else ""
         }
         AlertDialog.Builder(requireContext())
@@ -315,7 +316,7 @@ class ProfilesFragment : SettingsBasePreferenceFragment() {
 
     private fun notificationActions(entry: NotificationFlow.Entry) {
         val builder = AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.notification_item, eventName(entry.event), entry.address))
+            .setTitle(getString(R.string.notification_item, eventName(entry.event), ServerText.clean(entry.address, ServerText.MAX_ADDRESS_CHARS)))
             .setMessage(if (entry.ours) R.string.notification_text_ours else R.string.notification_text_other)
             .setNeutralButton(android.R.string.cancel, null)
             .setNegativeButton(R.string.notification_remove) { _, _ ->

@@ -11,6 +11,7 @@ import de.diamaneos.euicc.core.Json
 import de.diamaneos.euicc.core.JsonException
 import de.diamaneos.euicc.core.JsonLimits
 import de.diamaneos.euicc.core.JsonObject
+import de.diamaneos.euicc.core.RequestWatch
 import de.diamaneos.euicc.core.RspException
 import de.diamaneos.euicc.core.RspServer
 import de.diamaneos.euicc.core.RspServers
@@ -29,11 +30,14 @@ import javax.net.ssl.SSLSession
 import javax.net.ssl.X509TrustManager
 
 /** Opens [HttpsRspServer]s that trust only the shipped GSMA CI roots the eUICC also trusts. */
-class PinnedServers(private val roots: Map<String, X509Certificate>) : RspServers {
+class PinnedServers(
+    private val roots: Map<String, X509Certificate>,
+    private val stopped: () -> Boolean = { false },
+) : RspServers {
     override fun open(host: String, role: ServerRole, euiccCiIds: List<ByteArray>): RspServer {
         val anchors = GsmaCi.anchors(euiccCiIds, roots)
         if (anchors.isEmpty()) throw RspException(Failure.NO_TRUSTED_CI)
-        return HttpsRspServer(host, TlsPolicy(anchors, role))
+        return HttpsRspServer(host, TlsPolicy(anchors, role), stopped)
     }
 }
 
@@ -45,33 +49,40 @@ class PinnedServers(private val roots: Map<String, X509Certificate>) : RspServer
  *   handshake. The host name check is repeated after it.
  * - A fresh SSLContext per server object, so no TLS session is resumed across RSP sessions
  *   (3.1.2 step 5). "Connection: close", so no request is replayed on a reused connection.
- * - Timeouts on connect and every read. Response bodies are size-limited and parsed strictly.
+ * - Timeouts on connect and every read, and an overall deadline on each request that closes the
+ *   socket. [stopped] closes it too, for the requests before the user's choice is final: stopping
+ *   must not end the package download or the CancelSession that follows a stop.
+ * - Response bodies are size-limited and parsed strictly.
  * - No cookies, no cache, no compression. Nothing is logged.
  */
-class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : RspServer {
+class HttpsRspServer(
+    private val host: String,
+    private val policy: TlsPolicy,
+    private val stopped: () -> Boolean,
+) : RspServer {
     private val context: SSLContext = SSLContext.getInstance("TLS").apply {
         init(null, arrayOf(PinnedTrustManager(policy, host)), SecureRandom())
     }
 
     override fun initiateAuthentication(challenge: ByteArray, euiccInfo1: ByteArray) =
         Es9.parseInitiateAuthentication(postJson(Es9.PATH_INITIATE_AUTHENTICATION,
-            Es9.initiateAuthenticationRequest(challenge, euiccInfo1, host)))
+            Es9.initiateAuthenticationRequest(challenge, euiccInfo1, host), stopped = stopped))
 
     override fun authenticateClient(transactionId: ByteArray, authenticateServerResponse: ByteArray) =
         Es9.parseAuthenticateClient(postJson(Es9.PATH_AUTHENTICATE_CLIENT,
-            Es9.authenticateClientRequest(transactionId, authenticateServerResponse)))
+            Es9.authenticateClientRequest(transactionId, authenticateServerResponse), stopped = stopped))
 
     override fun authenticateClientEs11(transactionId: ByteArray, authenticateServerResponse: ByteArray) =
         Es9.parseEventEntries(postJson(Es9.PATH_AUTHENTICATE_CLIENT,
-            Es9.authenticateClientRequest(transactionId, authenticateServerResponse)))
+            Es9.authenticateClientRequest(transactionId, authenticateServerResponse), stopped = stopped))
 
     override fun getBoundProfilePackage(transactionId: ByteArray, prepareDownloadResponse: ByteArray) =
         Es9.parseBoundProfilePackage(postJson(Es9.PATH_GET_BOUND_PROFILE_PACKAGE,
             Es9.getBoundProfilePackageRequest(transactionId, prepareDownloadResponse),
-            Es9.MAX_BPP_RESPONSE_BYTES, Es9.BPP_LIMITS, BPP_READ_TIMEOUT_MS))
+            Es9.MAX_BPP_RESPONSE_BYTES, Es9.BPP_LIMITS, BPP_READ_TIMEOUT_MS, BPP_DEADLINE_MS))
 
     override fun handleNotification(pendingNotification: ByteArray) {
-        post(Es9.PATH_HANDLE_NOTIFICATION, Es9.handleNotificationRequest(pendingNotification), READ_TIMEOUT_MS) { conn ->
+        post(Es9.PATH_HANDLE_NOTIFICATION, Es9.handleNotificationRequest(pendingNotification), READ_TIMEOUT_MS, DEADLINE_MS, NEVER) { conn ->
             HttpRules.checkNotificationResponse(conn.responseCode)
             null
         }
@@ -88,8 +99,10 @@ class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : 
         max: Int = Es9.MAX_RESPONSE_BYTES,
         limits: JsonLimits = Es9.LIMITS,
         readTimeoutMs: Int = READ_TIMEOUT_MS,
+        deadlineMs: Long = DEADLINE_MS,
+        stopped: () -> Boolean = NEVER,
     ): JsonObject {
-        val bytes = post(path, body, readTimeoutMs) { conn ->
+        val bytes = post(path, body, readTimeoutMs, deadlineMs, stopped) { conn ->
             HttpRules.checkJsonResponse(conn.responseCode, conn.contentType, conn.contentLengthLong, max)
             conn.inputStream.use { HttpRules.readBounded(it, max) }
         }!!
@@ -100,13 +113,22 @@ class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : 
         }
     }
 
-    private fun <T> post(path: String, body: String, readTimeoutMs: Int, read: (HttpsURLConnection) -> T): T {
+    private fun <T> post(
+        path: String,
+        body: String,
+        readTimeoutMs: Int,
+        deadlineMs: Long,
+        stopped: () -> Boolean,
+        read: (HttpsURLConnection) -> T,
+    ): T {
         val payload = body.toByteArray(Charsets.UTF_8)
         val connection = try {
             URL("https", host, 443, path).openConnection() as HttpsURLConnection
         } catch (e: IOException) {
             throw RspException(Failure.NETWORK)
         }
+        // disconnect() closes the socket from another thread, during the handshake too.
+        val watch = RequestWatch(deadlineMs, stopped) { connection.disconnect() }
         try {
             connection.sslSocketFactory = context.socketFactory
             connection.hostnameVerifier = javax.net.ssl.HostnameVerifier { name, session -> verifyAgain(name, session) }
@@ -129,10 +151,11 @@ class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : 
         } catch (e: RspException) {
             throw e
         } catch (e: SSLException) {
-            throw RspException(Failure.TLS)
+            throw RspException(if (watch.fired) Failure.NETWORK else Failure.TLS)
         } catch (e: IOException) {
             throw RspException(if (e.cause is CertificateException) Failure.TLS else Failure.NETWORK)
         } finally {
+            watch.close()
             connection.disconnect()
         }
     }
@@ -156,6 +179,13 @@ class HttpsRspServer(private val host: String, private val policy: TlsPolicy) : 
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 30_000
         const val BPP_READ_TIMEOUT_MS = 60_000
+
+        // Generous: the server needs a read timeout's time to answer after connect and TLS, and
+        // a cut-off package download can use up the user's order. The package limit fits at
+        // about 3.5 kB/s, the other responses at about 1 kB/s.
+        const val DEADLINE_MS = 2 * 60_000L
+        const val BPP_DEADLINE_MS = 10 * 60_000L
+        val NEVER: () -> Boolean = { false }
     }
 }
 

@@ -94,8 +94,11 @@ interface RspUser {
 }
 
 sealed interface Outcome {
-    /** The profile is on the eUICC. [notified]: the install result reached the SM-DP+. */
-    class Installed(val metadata: ProfileMetadata, val notified: Boolean) : Outcome
+    /**
+     * The profile is on the eUICC, with the package's [metadata]. [notified]: the install result
+     * reached the SM-DP+. [labelChanges]: the names of the labels that differ from the confirmation.
+     */
+    class Installed(val metadata: ProfileMetadata, val notified: Boolean, val labelChanges: List<String> = emptyList()) : Outcome
 
     /** Dry run: the server passed TLS and the eUICC's AuthenticateServer checks. */
     class Checked(val serverCi: String, val svn: Version) : Outcome
@@ -151,7 +154,7 @@ class DownloadFlow(
         } catch (e: RspException) {
             // A refusal ends the server's session. After a lost answer it may still be open.
             return@guarded if (e.failure == Failure.SERVER_REFUSED) cancelOnCard(session, Outcome.Failed(e))
-            else cancelBoth(session, Outcome.Failed(e))
+            else cancelBoth(session, ended(e))
         }
         val signed2: SmdpSigned2
         val metadata: ProfileMetadata
@@ -218,9 +221,12 @@ class DownloadFlow(
         if (!bppTransaction.contentEquals(session.transactionId)) {
             return@guarded cancelBoth(session, failed(Failure.SERVER_MISMATCH))
         }
-        // 3.1.3.2: the rules in the package must be the ones the user agreed to.
-        ProfileMetadata.fromBoundProfilePackage(bpp)?.let {
-            if (it.policyRules != metadata.policyRules) return@guarded cancelBoth(session, failed(Failure.PPR_NOT_ALLOWED))
+        // 3.1.3.2: the package must not go beyond what the user agreed to. Its labels may differ.
+        val packaged = ProfileMetadata.fromBoundProfilePackage(bpp)
+            ?: return@guarded cancelBoth(session, failed(Failure.INVALID_RESPONSE))
+        if (packaged.policyRules != metadata.policyRules) return@guarded cancelBoth(session, failed(Failure.PPR_NOT_ALLOWED))
+        metadata.refusedChange(packaged)?.let {
+            return@guarded cancelBoth(session, Outcome.Failed(RspException(Failure.SERVER_MISMATCH, field = it)))
         }
 
         user.step(Step.INSTALLING)
@@ -237,7 +243,7 @@ class DownloadFlow(
         if (install.success) result.metadata.iccid?.let(installed)
         user.step(Step.NOTIFYING)
         val notified = sendInstallResult(result, session)
-        if (install.success) Outcome.Installed(metadata, notified)
+        if (install.success) Outcome.Installed(packaged, notified, metadata.labelChanges(packaged))
         else Outcome.Failed(RspException(Failure.INSTALL_FAILED, cardCode = install.errorReason))
     }
 
@@ -374,10 +380,13 @@ class DownloadFlow(
     } catch (e: Stop) {
         e.outcome
     } catch (e: RspException) {
-        Outcome.Failed(e)
+        ended(e)
     } catch (e: CardException) {
         Outcome.Failed(RspException(Failure.CARD, cardCode = e.code))
     }
+
+    /** Stop closes the connection of a running request. That is a stop, not a network failure. */
+    private fun ended(e: RspException) = if (user.cancelled) Outcome.Cancelled else Outcome.Failed(e)
 
     private fun failed(failure: Failure) = Outcome.Failed(RspException(failure))
 }

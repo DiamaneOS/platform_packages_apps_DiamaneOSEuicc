@@ -319,7 +319,7 @@ object RspTasks {
 
     private fun flow(context: Context, client: CardClient, task: RspTask) = DownloadFlow(
         card = RspCardAdapter(client, task.euicc),
-        servers = PinnedServers(CiRoots.get(context)),
+        servers = PinnedServers(CiRoots.get(context)) { task.cancelled },
         user = LoggingUser(task),
         installed = { iccid -> OwnedProfiles.add(context, iccid) },
     )
@@ -350,8 +350,8 @@ object RspTasks {
     private fun log(task: RspTask, outcome: Outcome) {
         val text = when (outcome) {
             is Outcome.Failed -> "failed ${outcome.failure} card=${outcome.error.cardCode} " +
-                "subject=${outcome.error.subjectCode} reason=${outcome.error.reasonCode}"
-            is Outcome.Installed -> "installed notified=${outcome.notified}"
+                "subject=${outcome.error.subjectCode} reason=${outcome.error.reasonCode} field=${outcome.error.field}"
+            is Outcome.Installed -> "installed notified=${outcome.notified} differs=${outcome.labelChanges.joinToString(",")}"
             is Outcome.Checked -> "checked ci=${outcome.serverCi} svn=${outcome.svn}"
             is Outcome.Found -> "found events=${outcome.events.size}"
             Outcome.Cancelled -> "cancelled"

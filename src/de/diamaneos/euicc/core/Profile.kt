@@ -44,10 +44,10 @@ class Profile(
     val deletedWhenDisabled: Boolean
         get() = policyRules and PolicyRules.DELETE_AFTER_DISABLING != 0
 
-    /** The nickname, else the profile name, else the provider. Null if none is set. */
+    /** The nickname, else the profile name, else the provider, cleaned. Null if none is set. */
     val displayName: String?
         get() = listOf(nickname, profileName, providerName)
-            .firstOrNull { !it.isNullOrBlank() }?.trim()
+            .map { ServerText.clean(it) }.firstOrNull { it.isNotEmpty() }
 
     override fun toString() = "Profile(state=$state, class=$profileClass, rules=$policyRules)"
 }
