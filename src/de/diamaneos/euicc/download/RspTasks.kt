@@ -19,6 +19,7 @@ import de.diamaneos.euicc.card.CardClient
 import de.diamaneos.euicc.card.Euicc
 import de.diamaneos.euicc.card.RspCardAdapter
 import de.diamaneos.euicc.core.ActivationCode
+import de.diamaneos.euicc.core.CardException
 import de.diamaneos.euicc.core.ConfirmRequest
 import de.diamaneos.euicc.core.Confirmation
 import de.diamaneos.euicc.core.DownloadFlow
@@ -29,6 +30,7 @@ import de.diamaneos.euicc.core.Results
 import de.diamaneos.euicc.core.RspException
 import de.diamaneos.euicc.core.RspUser
 import de.diamaneos.euicc.core.Step
+import de.diamaneos.euicc.core.retryWhileRestarting
 import de.diamaneos.euicc.net.PinnedServers
 import java.security.SecureRandom
 import java.util.concurrent.CountDownLatch
@@ -257,27 +259,37 @@ object RspTasks {
     /**
      * After a profile change: sends the pending notifications of profiles this app installed
      * (NotificationFlow), in the background. Waits until the eUICC is back after its restart.
-     * Gives up quietly if another session holds the card. The rest stays queued.
+     * The slot can show it before the restart starts, so card failures are retried for a while.
+     * Gives up if another session holds the card. The rest stays queued. Logs every outcome.
      */
     fun sendNotificationsAsync(context: Context, euicc: Euicc) {
         val app = context.applicationContext
         worker.execute {
-            val owned = OwnedProfiles.load(app) ?: return@execute
-            if (owned.size == 0) return@execute
-            val client = CardClient(app)
-            if (!waitForCard(client, euicc)) {
-                Log.i(TAG, "notifications: eUICC not back, kept")
+            val owned = OwnedProfiles.load(app)
+            if (owned == null || owned.size == 0) {
+                Log.i(TAG, if (owned == null) "notifications: storage locked, kept" else "notifications: none owned")
                 return@execute
             }
-            if (!cardSession.tryLock(LOCK_WAIT_S, TimeUnit.SECONDS)) return@execute
-            try {
-                val summary = notifications(app, client, euicc).sendOwned()
-                Log.i(TAG, "notifications: $summary")
+            val client = CardClient(app)
+            val text = try {
+                val retrying: (CardException) -> Unit = { Log.i(TAG, "notifications: card result ${it.code}, retrying") }
+                retryWhileRestarting(NOTIFY_RETRY_MS, retrying = retrying) {
+                    when {
+                        !waitForCard(client, euicc) -> "eUICC not back, kept"
+                        !cardSession.tryLock(LOCK_WAIT_S, TimeUnit.SECONDS) -> "card busy, kept"
+                        else -> try {
+                            notifications(app, client, euicc).sendOwned().toString()
+                        } finally {
+                            cardSession.unlock()
+                        }
+                    }
+                }
+            } catch (e: CardException) {
+                "card result ${e.code}, kept"
             } catch (e: Exception) {
-                Log.w(TAG, "notifications: ${e.javaClass.simpleName}")
-            } finally {
-                cardSession.unlock()
+                "${e.javaClass.simpleName}, kept"
             }
+            Log.i(TAG, "notifications: $text")
         }
     }
 
@@ -351,7 +363,8 @@ object RspTasks {
         val text = when (outcome) {
             is Outcome.Failed -> "failed ${outcome.failure} card=${outcome.error.cardCode} " +
                 "subject=${outcome.error.subjectCode} reason=${outcome.error.reasonCode} field=${outcome.error.field}"
-            is Outcome.Installed -> "installed notified=${outcome.notified} differs=${outcome.labelChanges.joinToString(",")}"
+            is Outcome.Installed -> "installed notified=${outcome.notified} others=${outcome.others ?: "none"} " +
+                "differs=${outcome.labelChanges.joinToString(",")}"
             is Outcome.Checked -> "checked ci=${outcome.serverCi} svn=${outcome.svn}"
             is Outcome.Found -> "found events=${outcome.events.size}"
             Outcome.Cancelled -> "cancelled"
@@ -374,6 +387,9 @@ object RspTasks {
     private const val LOCK_WAIT_S = 10L
     private const val CARD_WAIT_ATTEMPTS = 15
     private const val CARD_WAIT_MS = 1500L
+
+    /** The FP6's eUICC answers again within a few seconds after a switch. */
+    private val NOTIFY_RETRY_MS = listOf(2000L, 4000L, 8000L)
     private const val TAG = "DiamaneOSEuicc"
 }
 

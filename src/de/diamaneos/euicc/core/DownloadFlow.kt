@@ -97,8 +97,15 @@ sealed interface Outcome {
     /**
      * The profile is on the eUICC, with the package's [metadata]. [notified]: the install result
      * reached the SM-DP+. [labelChanges]: the names of the labels that differ from the confirmation.
+     * [others]: the profile's other pending notifications, sent after the install result (null:
+     * not tried or the card failed).
      */
-    class Installed(val metadata: ProfileMetadata, val notified: Boolean, val labelChanges: List<String> = emptyList()) : Outcome
+    class Installed(
+        val metadata: ProfileMetadata,
+        val notified: Boolean,
+        val labelChanges: List<String> = emptyList(),
+        val others: NotificationFlow.Summary? = null,
+    ) : Outcome
 
     /** Dry run: the server passed TLS and the eUICC's AuthenticateServer checks. */
     class Checked(val serverCi: String, val svn: Version) : Outcome
@@ -123,7 +130,7 @@ sealed interface Outcome {
  *   the eUICC and the server with reason "postponed" (or "timeout" when the user did not
  *   answer), the only reasons that keep the operator's order usable (5.7.14).
  * - After GetBoundProfilePackage the package is installed. The eUICC's install result goes to
- *   the address in it.
+ *   the address in it, then the profile's other pending notifications.
  * [installed] records the ICCID of a profile this app installed, before its notification.
  */
 class DownloadFlow(
@@ -243,7 +250,15 @@ class DownloadFlow(
         if (install.success) result.metadata.iccid?.let(installed)
         user.step(Step.NOTIFYING)
         val notified = sendInstallResult(result, session)
-        if (install.success) Outcome.Installed(packaged, notified, metadata.labelChanges(packaged))
+        // 5.5.5: after the install result the eUICC adds the install notifications the profile's
+        // metadata asks for, with higher sequence numbers. They follow it (3.5). The result, if
+        // still there, is only removed: the SM-DP+ acknowledged it.
+        val others = if (install.success && notified) {
+            result.metadata.iccid?.let { sendOthers(it, setOf(result.metadata.seq)) }
+        } else {
+            null
+        }
+        if (install.success) Outcome.Installed(packaged, notified, metadata.labelChanges(packaged), others)
         else Outcome.Failed(RspException(Failure.INSTALL_FAILED, cardCode = install.errorReason))
     }
 
@@ -344,8 +359,17 @@ class DownloadFlow(
         } catch (e: RspException) {
             false
         } catch (e: CardException) {
-            true // sent. The eUICC keeps it until a later removal
+            true // sent. Removed again with the profile's other notifications
         }
+    }
+
+    /** The pending notifications of [iccid]. [acknowledged] are only removed. Null if the card failed. */
+    private fun sendOthers(iccid: String, acknowledged: Set<Int>): NotificationFlow.Summary? = try {
+        NotificationFlow(card, servers, { it == iccid }, {}).sendOwned(acknowledged)
+    } catch (e: CardException) {
+        null
+    } catch (e: IllegalArgumentException) {
+        null
     }
 
     /** Clears the eUICC's session (the server never saw the MatchingID, or has ended its side). */

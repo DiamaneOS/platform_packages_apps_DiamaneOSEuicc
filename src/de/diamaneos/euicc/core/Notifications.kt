@@ -55,8 +55,8 @@ class NotificationFlow(
     private val owned: (String) -> Boolean,
     private val forget: (String) -> Unit,
 ) {
-    class Summary(val sent: Int, val failed: Int, val kept: Int) {
-        override fun toString() = "sent=$sent failed=$failed kept=$kept"
+    class Summary(val sent: Int, val failed: Int, val kept: Int, val cleared: Int = 0) {
+        override fun toString() = "sent=$sent failed=$failed kept=$kept cleared=$cleared"
     }
 
     /** One pending notification, for the list on the screen. No ICCID. */
@@ -64,10 +64,24 @@ class NotificationFlow(
 
     fun list(): List<Entry> = pending().map { (n, ours) -> Entry(n.metadata.seq, n.metadata.event, n.metadata.address, ours) }
 
-    fun sendOwned(): Summary {
+    /**
+     * [acknowledged]: sequence numbers the server already acknowledged whose removal failed.
+     * They are removed here, not sent again (3.5: the sequence number guards against replays).
+     */
+    fun sendOwned(acknowledged: Set<Int> = emptySet()): Summary {
         val all = pending()
-        val mine = all.filter { it.second }.map { it.first }
-        if (mine.isEmpty()) return Summary(0, 0, all.size)
+        var cleared = 0
+        for ((n, _) in all.filter { it.first.metadata.seq in acknowledged }) {
+            try {
+                card.removeNotification(n.metadata.seq)
+                cleared++
+            } catch (e: CardException) {
+                // Still on the eUICC, listed as not sent.
+            }
+        }
+        val kept = all.count { !it.second }
+        val mine = all.filter { it.second && it.first.metadata.seq !in acknowledged }.map { it.first }
+        if (mine.isEmpty()) return Summary(0, 0, kept, cleared)
         val ciIds = EuiccInfo1.parse(card.euiccInfo1()).ciForVerification
         var sent = 0
         var failed = 0
@@ -97,7 +111,7 @@ class NotificationFlow(
                 failed += ordered.size - index
             }
         }
-        return Summary(sent, failed, all.size - mine.size)
+        return Summary(sent, failed, kept, cleared)
     }
 
     /** Removes one notification without sending it (the user's choice). */

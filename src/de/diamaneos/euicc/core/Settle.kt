@@ -23,3 +23,27 @@ fun <T> readUntilSettled(
     }
     return value
 }
+
+/**
+ * Runs [block], and again after each pause in [pauses] (milliseconds) while it fails with a
+ * transient [CardException]: right after a switch the slot can still show the eUICC while it
+ * restarts and refuses commands. [retrying] hears each such failure. Other failures, and the
+ * last one, are thrown.
+ */
+fun <T> retryWhileRestarting(
+    pauses: List<Long>,
+    sleep: (Long) -> Unit = { Thread.sleep(it) },
+    retrying: (CardException) -> Unit = {},
+    block: () -> T,
+): T {
+    for (pause in pauses) {
+        try {
+            return block()
+        } catch (e: CardException) {
+            if (!Results.isTransient(e.code)) throw e
+            retrying(e)
+        }
+        sleep(pause)
+    }
+    return block()
+}

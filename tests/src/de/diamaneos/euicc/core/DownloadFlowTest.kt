@@ -10,12 +10,17 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** A scripted eUICC: records the commands. [fail] makes one throw a CardException. */
+/**
+ * A scripted eUICC: records the commands. [fail] makes one throw a CardException, [failOnce]
+ * the next call of that name only. [installAlso] are queued after the install result.
+ */
 class FakeCard : RspCard {
     val calls = mutableListOf<String>()
     var info1 = Rsp.euiccInfo1()
     var authenticateResponse = Rsp.authenticateServerOk()
     var fail = mutableMapOf<String, Int>()
+    val failOnce = mutableListOf<Pair<String, Int>>()
+    val installAlso = mutableListOf<ByteArray>()
     var hashCc: ByteArray? = null
     var matchingId: String? = null
     var cancelReasons = mutableListOf<Int>()
@@ -27,6 +32,10 @@ class FakeCard : RspCard {
     private fun call(name: String) {
         calls += name
         fail[name]?.let { throw CardException(it) }
+        failOnce.firstOrNull { it.first == name }?.let {
+            failOnce.remove(it)
+            throw CardException(it.second)
+        }
     }
 
     override fun euiccInfo1() = info1.also { call("info1") }
@@ -42,7 +51,7 @@ class FakeCard : RspCard {
         return Rsp.prepareDownloadOk()
     }
     override fun loadBoundProfilePackage(bpp: ByteArray): ByteArray {
-        installAs?.let { pending += it }
+        installAs?.let { pending += it; pending += installAlso }
         call("load")
         return installAs ?: throw CardException(-1)
     }
@@ -141,7 +150,8 @@ class DownloadFlowTest {
         assertTrue((outcome as Outcome.Installed).notified)
         assertEquals("MATCHING-1", card.matchingId)
         assertEquals(listOf("initiate", "authenticateClient", "getBpp", "handleNotification"), server.calls)
-        assertEquals(listOf("info1", "challenge", "authenticateServer", "prepareDownload", "load", "notifications", "remove 7"), card.calls)
+        assertEquals(listOf("info1", "challenge", "authenticateServer", "prepareDownload", "load", "notifications", "remove 7",
+            "notifications"), card.calls)
         assertNull(card.hashCc)
         assertEquals(listOf(ICCID_A), owned)
         assertTrue(card.pending.isEmpty())
@@ -471,6 +481,47 @@ class DownloadFlowTest {
         assertEquals(1, card2.pending.size)
     }
 
+    /** 5.5.5: the profile's own install notification (seq 8) follows the install result (seq 7). */
+    @Test
+    fun theProfilesInstallNotificationsFollowTheResult() {
+        card.pending += Rsp.otherNotification(3, NotificationEvents.DELETE, iccid = null)
+        card.installAlso += Rsp.otherNotification(8, NotificationEvents.INSTALL)
+        val outcome = flow.download(code) as Outcome.Installed
+        assertTrue(outcome.notified)
+        assertEquals(listOf(7, 8), server.notified.map { PendingNotification.parse(it).metadata.seq })
+        assertEquals(1, outcome.others!!.sent)
+        assertEquals(1, outcome.others!!.kept)
+        assertEquals(3, PendingNotification.parse(card.pending.single()).metadata.seq)
+
+        // Not sent before the install result: that stays the first of the group.
+        val card2 = FakeCard().apply { installAlso += Rsp.otherNotification(8, NotificationEvents.INSTALL) }
+        val server2 = FakeServer().apply { drop += "handleNotification" }
+        val unsent = DownloadFlow(card2, FakeServers("smdp.example.com" to server2), FakeUser()).download(code) as Outcome.Installed
+        assertNull(unsent.others)
+        assertEquals(1, server2.calls.count { it == "handleNotification" })
+        assertEquals(2, card2.pending.size)
+    }
+
+    /** An install result the SM-DP+ acknowledged is removed later, never sent twice (3.5). */
+    @Test
+    fun anAcknowledgedResultIsRemovedNotResent() {
+        card.failOnce += "remove 7" to 127
+        card.installAlso += Rsp.otherNotification(8, NotificationEvents.INSTALL)
+        val outcome = flow.download(code) as Outcome.Installed
+        assertTrue(outcome.notified)
+        assertEquals(listOf(7, 8), server.notified.map { PendingNotification.parse(it).metadata.seq })
+        assertEquals(1, outcome.others!!.cleared)
+        assertEquals(2, card.calls.count { it == "remove 7" })
+        assertTrue(card.pending.isEmpty())
+
+        // A card failure after the install result still leaves an installed profile.
+        val card2 = FakeCard()
+        val server2 = FakeServer().apply { onCall = { if (it == "handleNotification") card2.fail["notifications"] = -1 } }
+        val installed = DownloadFlow(card2, FakeServers("smdp.example.com" to server2), FakeUser()).download(code)
+        assertTrue(installed.toString(), installed is Outcome.Installed)
+        assertNull((installed as Outcome.Installed).others)
+    }
+
     @Test
     fun discovery() {
         val smds = FakeServer("ds.example.com").apply {
@@ -534,6 +585,31 @@ class NotificationFlowTest {
         assertEquals(1, flow.sendOwned().kept)
         assertTrue(servers.opened.isEmpty())
         assertFalse("info1" in card.calls)
+    }
+
+    @Test
+    fun acknowledgedAreRemovedNotResent() {
+        card.pending += Rsp.otherNotification(1, NotificationEvents.INSTALL, "a.example.com")
+        card.pending += Rsp.otherNotification(2, NotificationEvents.ENABLE, "a.example.com")
+        val summary = flow.sendOwned(acknowledged = setOf(1))
+        assertEquals(1, summary.cleared)
+        assertEquals(1, summary.sent)
+        assertEquals(listOf(2), a.notified.map { PendingNotification.parse(it).metadata.seq })
+        assertTrue(card.pending.isEmpty())
+    }
+
+    /** After a switch the eUICC restarts: a transient card failure is retried, nothing is sent twice. */
+    @Test
+    fun sendingWaitsForTheRestartedCard() {
+        card.pending += Rsp.otherNotification(1, NotificationEvents.ENABLE, "a.example.com")
+        card.failOnce += "notifications" to Results.CARD_UNKNOWN_ERROR
+        card.failOnce += "notifications" to Results.CARD_EUICC_NOT_FOUND
+        val pauses = mutableListOf<Long>()
+        val summary = retryWhileRestarting(listOf(2000L, 4000L, 8000L), { pauses += it }) { flow.sendOwned() }
+        assertEquals(listOf(2000L, 4000L), pauses)
+        assertEquals(1, summary.sent)
+        assertEquals(1, a.notified.size)
+        assertTrue(card.pending.isEmpty())
     }
 
     @Test
