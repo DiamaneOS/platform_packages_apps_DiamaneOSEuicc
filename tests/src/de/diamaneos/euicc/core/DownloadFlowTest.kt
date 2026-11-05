@@ -377,6 +377,22 @@ class DownloadFlowTest {
         }
     }
 
+    /** Metadata that reads two ways is neither shown nor installed: the rules here are none or PPR1 and PPR2. */
+    @Test
+    fun metadataWithTwoReadingsIsNotUsed() {
+        val twice = Der.tlv(ProfileMetadata.TAG, Tlv.one(Rsp.metadata()).value + Der.bits(3, tag = 0x99) + Der.bits(3, 1, 2, tag = 0x99))
+        val card = FakeCard()
+        val server = FakeServer().apply { bpp = Rsp.boundProfilePackage(twice) }
+        assertEquals(Failure.INVALID_RESPONSE, failure(DownloadFlow(card, FakeServers("smdp.example.com" to server), FakeUser()).download(code)))
+        assertFalse("load" in card.calls)
+        assertEquals("cancelSession", server.calls.last())
+
+        val user = FakeUser()
+        val shown = FakeServer().apply { client = Rsp.authenticateClient(metadata = twice) }
+        assertEquals(Failure.INVALID_RESPONSE, failure(DownloadFlow(FakeCard(), FakeServers("smdp.example.com" to shown), user).download(code)))
+        assertNull(user.request)
+    }
+
     /** Stop closes a running request's connection: the user sees a stop, not a network failure. */
     @Test
     fun aStopThatEndsARequestIsNotAFailure() {

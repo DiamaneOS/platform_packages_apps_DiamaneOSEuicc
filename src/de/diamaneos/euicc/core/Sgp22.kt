@@ -31,7 +31,7 @@ class ServerSigned1(
 
     companion object {
         fun parse(data: ByteArray): ServerSigned1 {
-            val seq = Tlv.one(data, 0x30)
+            val seq = Tlv.one(data, 0x30).uniqueComponents()
             val transactionId = seq.require(0x80).value
             require(transactionId.size in 1..16) { "bad transaction ID" }
             val challenge = seq.require(0x81).value
@@ -49,7 +49,7 @@ class SmdpSigned2(val transactionId: ByteArray, val ccRequired: Boolean) {
 
     companion object {
         fun parse(data: ByteArray): SmdpSigned2 {
-            val seq = Tlv.one(data, 0x30)
+            val seq = Tlv.one(data, 0x30).uniqueComponents()
             return SmdpSigned2(seq.require(0x80).value, seq.require(0x01).bool())
         }
     }
@@ -119,7 +119,7 @@ class ProfileMetadata(
 
         fun parse(element: Tlv): ProfileMetadata {
             require(element.tag == TAG) { "unexpected tag" }
-            val children = element.children()
+            val children = element.uniqueComponents().children()
             fun child(tag: Int) = children.firstOrNull { it.tag == tag }
             val name = child(0x92)?.utf8().orEmpty()
             val provider = child(0x91)?.utf8().orEmpty()
@@ -127,9 +127,9 @@ class ProfileMetadata(
             var events = 0
             child(0xB6)?.children()?.forEach { entry ->
                 require(entry.tag == 0x30) { "bad notification configuration" }
-                events = events or entry.require(0x80).bits().toFlags()
+                events = events or entry.uniqueComponents().require(0x80).derBits().toFlags()
             }
-            val owner = child(0xB7)?.let { o ->
+            val owner = child(0xB7)?.uniqueComponents()?.let { o ->
                 val mccMnc = o.require(0x80).value
                 require(mccMnc.size == 3) { "bad MCC/MNC" }
                 OperatorId(mccMnc, o.child(0x81)?.value, o.child(0x82)?.value)
@@ -138,11 +138,17 @@ class ProfileMetadata(
                 iccid = child(0x5A)?.value?.let { Iccid.decode(it) },
                 serviceProviderName = provider,
                 profileName = name,
-                profileClass = child(0x95)?.int() ?: CLASS_OPERATIONAL,
-                ppr = child(0x99)?.bits()?.toFlags() ?: 0,
+                profileClass = child(0x95)?.let(::profileClass) ?: CLASS_OPERATIONAL,
+                ppr = child(0x99)?.derBits()?.toFlags() ?: 0,
                 owner = owner,
                 notifiedEvents = events and NotificationEvents.ALL,
             )
+        }
+
+        /** ProfileClass: one of the classes the confirmation names, in its one DER form. */
+        private fun profileClass(element: Tlv): Int {
+            require(element.value.size == 1 && element.value[0].toInt() in CLASS_TEST..CLASS_OPERATIONAL) { "bad class" }
+            return element.value[0].toInt()
         }
 
         /**
@@ -161,6 +167,22 @@ class ProfileMetadata(
 
         private const val MAC_LENGTH = 8
     }
+}
+
+/**
+ * [this], if no component of the SEQUENCE repeats (X.680 allows each once). A repeat could be
+ * read either way, by this app and by the eUICC.
+ */
+private fun Tlv.uniqueComponents(): Tlv = apply {
+    val tags = children().map { it.tag }
+    require(tags.toSet().size == tags.size) { "repeated component" }
+}
+
+/** BIT STRING contents whose unused bits are zero (DER), so no reader can see other bits. */
+private fun Tlv.derBits(): BitString {
+    val bits = bits()
+    require(value.last().toInt() and ((1 shl value[0].toInt()) - 1) == 0) { "bad bit string" }
+    return bits
 }
 
 /** NotificationMetadata (5.7.10). [event] is one NotificationEvents bit. */

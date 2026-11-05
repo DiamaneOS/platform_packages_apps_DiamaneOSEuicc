@@ -169,6 +169,48 @@ class Sgp22Test {
         assertThrows(IllegalArgumentException::class.java) { ProfileMetadata.parse(Rsp.metadata(name = "x".repeat(65))) }
     }
 
+    /** A repeated component, a class the confirmation cannot name or set unused bits read two ways. */
+    @Test
+    fun metadataHasOneReading() {
+        fun hex(s: String) = Hex.decode(s.replace(" ", ""))!!
+        fun with(base: ByteArray, vararg extra: String) =
+            Der.tlv(ProfileMetadata.TAG, Tlv.one(base).value + hex(extra.joinToString("")))
+        val plain = Rsp.metadata()
+        for (extra in listOf(
+            arrayOf("95 01 02", "95 01 00"), // the class twice
+            arrayOf("99 02 05 00", "99 02 05 60"), // the rules twice
+            arrayOf("92 01 41"), // the name twice
+            arrayOf("B7 0A 80 03 42 F6 18 80 03 42 F6 19"), // the owner's MCC/MNC twice
+            arrayOf("95 01 05"), arrayOf("95 01 F5"), arrayOf("95 02 00 02"), // no such class, or not DER
+            arrayOf("99 02 07 60"), // rules in the unused bits
+        )) {
+            assertThrows(extra.joinToString(), IllegalArgumentException::class.java) { ProfileMetadata.parse(with(plain, *extra)) }
+        }
+        val noEvents = Rsp.metadata(notified = intArrayOf())
+        for (entry in listOf("B6 0A 30 08 80 02 04 80 80 02 04 10", "B6 06 30 04 80 02 04 9F")) {
+            assertThrows(entry, IllegalArgumentException::class.java) { ProfileMetadata.parse(with(noEvents, entry)) }
+        }
+        assertNull(ProfileMetadata.fromBoundProfilePackage(Rsp.boundProfilePackage(with(plain, "99 02 05 00", "99 02 05 60"))))
+        // One of each still reads.
+        for (c in 0..2) assertEquals(c, ProfileMetadata.parse(with(plain, "95 01 0$c")).profileClass)
+        assertEquals(3, ProfileMetadata.parse(with(plain, "99 02 05 60")).policyRules)
+        // No rules, in the forms an encoder can give them.
+        for (none in listOf("99 01 00", "99 02 00 00", "99 02 05 00")) assertEquals(0, ProfileMetadata.parse(with(plain, none)).policyRules)
+        assertEquals(NotificationEvents.INSTALL or NotificationEvents.DELETE,
+            ProfileMetadata.parse(with(noEvents, "B6 0A 30 08 80 02 04 90 81 02 61 62")).notifiedEvents)
+    }
+
+    /** The address and the confirmation code flag the eUICC checks again are read one way. */
+    @Test
+    fun signedDataHasOneReading() {
+        val signed1 = Tlv.one(Rsp.serverSigned1()).value
+        assertThrows(IllegalArgumentException::class.java) {
+            ServerSigned1.parse(Der.tlv(0x30, signed1 + Der.utf8("other.example.com", 0x83)))
+        }
+        val signed2 = Tlv.one(Rsp.smdpSigned2()).value
+        assertThrows(IllegalArgumentException::class.java) { SmdpSigned2.parse(Der.tlv(0x30, signed2 + Der.bool(true))) }
+    }
+
     @Test
     fun metadataInsideTheBoundProfilePackage() {
         val bpp = Rsp.boundProfilePackage(Rsp.metadata(ppr = intArrayOf(2)))
