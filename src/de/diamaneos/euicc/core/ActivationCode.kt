@@ -65,14 +65,16 @@ class ActivationCode(
             val host = Fqdn.normalise(address.trim()) ?: throw Invalid(Problem.ADDRESS)
             val token = matchingId.trim()
             if (token.length > MAX_LENGTH || !TOKEN.matches(token)) throw Invalid(Problem.TOKEN)
-            return ActivationCode(host, token, null, false)
+            return ActivationCode(host, token, null, false).also {
+                if (it.encoded().length > MAX_LENGTH) throw Invalid(Problem.TOO_LONG)
+            }
         }
 
         /** An SM-DS event (3.1.3 option b): the MatchingID is the EventID. Null if either is invalid. */
         fun fromEvent(rspServerAddress: String, eventId: String): ActivationCode? {
             val host = Fqdn.normalise(rspServerAddress) ?: return null
             if (eventId.isEmpty() || eventId.length > MAX_LENGTH || !TOKEN.matches(eventId)) return null
-            return ActivationCode(host, eventId, null, false)
+            return ActivationCode(host, eventId, null, false).takeIf { it.encoded().length <= MAX_LENGTH }
         }
     }
 }

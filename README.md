@@ -41,8 +41,8 @@ consumer devices).
   what it receives: the EID, the IMEI, the model code (TAC) and the radio
   capabilities (Android's device information, 4.2).
 - Activation codes (4.1): `LPA:1$<SM-DP+>$<matching ID>[$<OID>[$1]]`, or the
-  SM-DP+ address and activation code typed separately. The OID, if given, must
-  be in the server's certificate.
+  SM-DP+ address and activation code typed separately, 255 characters at most.
+  Host names are ASCII. The OID, if given, must be in the server's certificate.
 - Checks before the eUICC signs anything: the server signed this session's
   challenge and the address the code names, and it uses a CI the eUICC signs
   with.

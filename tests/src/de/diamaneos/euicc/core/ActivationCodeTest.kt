@@ -102,6 +102,20 @@ class ActivationCodeTest {
         assertNull(ActivationCode.fromEvent("not a host", "EVENT-1"))
     }
 
+    /** SGP.22 4.1 bounds the whole code at 255 characters, however it was entered. */
+    @Test
+    fun manualAndEventCodesAreBoundedLikeScannedOnes() {
+        val host = (1..4).joinToString(".") { "a".repeat(60) } + ".examples" // 252 characters
+        assertEquals(ActivationCode.Problem.TOO_LONG, problem("1\$$host\$AB"))
+        assertEquals(ActivationCode.Problem.TOO_LONG,
+            assertThrows(ActivationCode.Invalid::class.java) { ActivationCode.fromParts(host, "AB") }.problem)
+        assertNull(ActivationCode.fromEvent(host, "AB"))
+        val fits = ActivationCode.fromParts(host, "")
+        assertEquals(255, fits.encoded().length)
+        assertEquals(fits.encoded(), ActivationCode.parse(fits.encoded()).encoded())
+        assertEquals("smdp.example.com", ActivationCode.fromEvent("smdp.example.com", "E".repeat(200))!!.smdpAddress)
+    }
+
     /** Lowercasing makes U+212A KELVIN SIGN a "k": a host is its own ASCII text or nothing. */
     @Test
     fun hostsAreAsciiBeforeLowercasing() {
