@@ -290,7 +290,7 @@ class DownloadFlow(
         // 3.1.2 step 10: the address the server signed must be the one we asked.
         if (!signed1.transactionId.contentEquals(auth.transactionId) ||
             !signed1.euiccChallenge.contentEquals(challenge) ||
-            !signed1.serverAddress.equals(host, ignoreCase = true)) {
+            Fqdn.normalise(signed1.serverAddress) != host) {
             throw Stop(failed(Failure.SERVER_MISMATCH))
         }
         val ciToBeUsed = try {

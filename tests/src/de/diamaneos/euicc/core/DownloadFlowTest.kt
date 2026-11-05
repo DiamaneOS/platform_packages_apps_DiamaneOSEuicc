@@ -244,6 +244,17 @@ class DownloadFlowTest {
         }
     }
 
+    /** The signed address matches the host in ASCII case only: U+017F (long s) folds to "s" otherwise. */
+    @Test
+    fun theSignedAddressMatchesInAsciiOnly() {
+        val card = FakeCard()
+        val server = FakeServer().apply { initiate = Rsp.initiateAuthentication(Rsp.serverSigned1(address = "\u017Fmdp.example.com")) }
+        assertEquals(Failure.SERVER_MISMATCH, failure(DownloadFlow(card, FakeServers("smdp.example.com" to server), FakeUser()).download(code)))
+        assertFalse("authenticateServer" in card.calls)
+        val upper = FakeServer().apply { initiate = Rsp.initiateAuthentication(Rsp.serverSigned1(address = "SMDP.Example.COM")) }
+        assertTrue(DownloadFlow(FakeCard(), FakeServers("smdp.example.com" to upper), FakeUser()).download(code) is Outcome.Installed)
+    }
+
     @Test
     fun oidFromTheCodeMustMatchTheServerCertificate() {
         server.initiate = Rsp.initiateAuthentication(certificate = Certificates.parse(

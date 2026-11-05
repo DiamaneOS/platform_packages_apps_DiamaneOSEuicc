@@ -102,6 +102,17 @@ class ActivationCodeTest {
         assertNull(ActivationCode.fromEvent("not a host", "EVENT-1"))
     }
 
+    /** Lowercasing makes U+212A KELVIN SIGN a "k": a host is its own ASCII text or nothing. */
+    @Test
+    fun hostsAreAsciiBeforeLowercasing() {
+        assertEquals(ActivationCode.Problem.ADDRESS, problem("LPA:1\$\u212Aey.example.com\$X"))
+        assertThrows(ActivationCode.Invalid::class.java) { ActivationCode.fromParts("\u212Aey.example.com", "X") }
+        assertNull(ActivationCode.fromEvent("smdp.\u212Aey.example.com", "EVENT-1"))
+        assertNull(Fqdn.normalise("\u212Aey.example.com"))
+        assertFalse(Fqdn.matches("\u212Aey.example.com", "key.example.com"))
+        assertEquals("key.example.com", Fqdn.normalise("KEY.example.com"))
+    }
+
     @Test
     fun hostNames() {
         assertEquals("a.b.example", Fqdn.normalise("A.B.Example"))

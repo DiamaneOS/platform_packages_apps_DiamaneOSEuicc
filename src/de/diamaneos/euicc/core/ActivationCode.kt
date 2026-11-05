@@ -83,6 +83,8 @@ object Fqdn {
 
     /** Lowercase [input] if it is a fully qualified LDH host name of two or more labels. Else null. */
     fun normalise(input: String): String? {
+        // Lowercasing turns some other characters into ASCII letters (U+212A KELVIN SIGN into k).
+        if (input.any { it.code > 0x7F }) return null
         val host = input.lowercase(java.util.Locale.ROOT)
         if (host.isEmpty() || host.length > 253) return null
         val labels = host.split('.')
