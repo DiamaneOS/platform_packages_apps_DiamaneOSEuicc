@@ -228,7 +228,10 @@ object Es9 {
         return Hex.decode(text) ?: throw invalid()
     }
 
-    /** A base64 member that must decode to exactly one TLV with [tag] (strict base64, RFC 4648). */
+    /**
+     * A base64 member that must decode to exactly one TLV with [tag]. Standard alphabet, no line
+     * breaks. Missing padding gives the same bytes, and refusing it could use up the order.
+     */
     private fun tlv(body: JsonObject, name: String, tag: Int): ByteArray {
         val text = body.string(name) ?: throw invalid()
         val bytes = try {

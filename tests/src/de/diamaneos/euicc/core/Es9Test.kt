@@ -168,6 +168,14 @@ class Es9Test {
         assertThrows(RspException::class.java) { Es9.parseInitiateAuthentication(Json.parse("{\"transactionId\":\"00\"}") as JsonObject) }
     }
 
+    /** The package arrives after the order is used. Text that gives the same bytes must not cost it. */
+    @Test
+    fun aPackageWithoutPaddingIsRead() {
+        val bpp = Der.tlv(0xBF36, ByteArray(1))
+        val body = success("transactionId" to Es9.hex(Rsp.TRANSACTION_ID), "boundProfilePackage" to b64(bpp).trimEnd('='))
+        assertArrayEquals(bpp, Es9.parseBoundProfilePackage(body).second)
+    }
+
     @Test
     fun statusCodes() {
         fun status(status: String, subject: String? = null) = Json.parse(Json.write(mapOf("header" to mapOf(

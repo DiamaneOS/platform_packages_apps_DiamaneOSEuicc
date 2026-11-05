@@ -84,7 +84,7 @@ consumer devices).
   (`id-rspRole-dp-tls` or `-ds-tls`), a dNSName for the host.
 - No revocation check (optional for the LPA in 4.5.2.2).
 - Responses: 64 KB, or 2 MB for the Bound Profile Package, strict JSON (UTF-8,
-  no duplicates, limits on depth, sizes and counts), strict base64, and DER
+  no duplicates, limits on depth, sizes and counts), standard base64, and DER
   that must be the expected object. The signed data and the profile metadata
   have one reading: each component once, tags in their one allowed form, a
   known class and no bits set beyond a BIT STRING's length.
