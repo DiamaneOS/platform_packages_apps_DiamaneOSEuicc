@@ -65,7 +65,8 @@ class Tlv(val tag: Int, val value: ByteArray) {
         /**
          * The elements in [data] at one level. Throws IllegalArgumentException on malformed
          * input: truncated tag, length or value, indefinite or over-long lengths, tags over
-         * three bytes.
+         * three bytes, tags in a form X.690 8.1.2.4 forbids (they name the same component as
+         * another tag for a decoder that reads tag numbers).
          */
         fun parse(data: ByteArray): List<Tlv> {
             val result = ArrayList<Tlv>()
@@ -76,9 +77,11 @@ class Tlv(val tag: Int, val value: ByteArray) {
                     var count = 0
                     do {
                         val next = byteAt(data, pos++)
+                        require(count > 0 || next != 0x80) { "bad tag" }
                         tag = (tag shl 8) or next
                         require(++count <= 2) { "tag too long" }
                     } while (next and 0x80 != 0)
+                    require(count > 1 || tag and 0x7F >= 0x1F) { "bad tag" }
                 }
                 var length = byteAt(data, pos++)
                 if (length and 0x80 != 0) {

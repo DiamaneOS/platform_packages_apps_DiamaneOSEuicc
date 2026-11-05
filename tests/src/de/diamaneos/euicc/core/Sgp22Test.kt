@@ -73,6 +73,22 @@ class BerTest {
         assertThrows(IllegalArgumentException::class.java) { Tlv.one(hex("04 00"), 0x30) }
     }
 
+    /** X.690 8.1.2.4: tag numbers below 31 in the long form, or with a leading 0x80, alias other tags. */
+    @Test
+    fun rejectsTagsInForbiddenForms() {
+        // [25] PprIds as 9F 19 instead of 99, [22] as BF 16 instead of B6, [0] as 1F 00.
+        for (input in listOf("9F 19 02 05 60", "BF 16 00", "1F 00 00", "BF 80 25 00", "9F 80 81 00 00")) {
+            assertThrows(input, IllegalArgumentException::class.java) { Tlv.parse(hex(input)) }
+        }
+        val metadata = Tlv.one(Rsp.metadata()).value
+        assertThrows(IllegalArgumentException::class.java) {
+            ProfileMetadata.parse(Der.tlv(ProfileMetadata.TAG, metadata + hex("9F 19 02 05 60")))
+        }
+        assertEquals(0x9F1F, Tlv.one(hex("9F 1F 00")).tag)
+        assertEquals(0xBF8101, Tlv.one(hex("BF 81 01 00")).tag)
+        assertEquals(ProfileMetadata.TAG, Tlv.one(Rsp.metadata()).tag)
+    }
+
     @Test
     fun iccids() {
         assertEquals(ICCID_A, Iccid.decode(Rsp.ICCID_A_BYTES))
