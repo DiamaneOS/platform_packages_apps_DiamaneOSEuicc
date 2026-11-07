@@ -71,7 +71,10 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
     private var shownConfirm: ConfirmRequest? = null
     private var shownOutcome: Outcome? = null
     private var awaitingScan = false
+    /** What a code from the running scan is for: adding the eSIM or only checking the code. */
+    private var scanKind = RspTask.Kind.DOWNLOAD
     private var offered: String? = null
+    private var offeredKind = RspTask.Kind.DOWNLOAD
     private var usedCode: String? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -79,6 +82,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
         appContext = context.applicationContext
         client = CardClient(appContext)
         awaitingScan = savedInstanceState?.getBoolean(STATE_SCAN) ?: false
+        if (savedInstanceState?.getBoolean(STATE_SCAN_CHECK) == true) scanKind = RspTask.Kind.CHECK
         preferenceScreen = preferenceManager.createPreferenceScreen(context)
         status = Preference(context).apply {
             isSelectable = false
@@ -101,6 +105,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(STATE_SCAN, awaitingScan)
+        outState.putBoolean(STATE_SCAN_CHECK, scanKind == RspTask.Kind.CHECK)
     }
 
     override fun onResume() {
@@ -111,7 +116,8 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
             takeOffered()
         } else if (awaitingScan && task == null) {
             awaitingScan = false
-            paste(auto = true)
+            paste(auto = true, kind = scanKind)
+            scanKind = RspTask.Kind.DOWNLOAD
         }
     }
 
@@ -140,14 +146,16 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
      */
     fun offer(code: String) {
         offered = code
+        offeredKind = if (awaitingScan) scanKind else RspTask.Kind.DOWNLOAD
         awaitingScan = false
+        scanKind = RspTask.Kind.DOWNLOAD
         if (isResumed) takeOffered()
     }
 
     private fun takeOffered() {
         val code = offered ?: return
         offered = null
-        download(code)
+        if (offeredKind == RspTask.Kind.CHECK) checkCode(code) else download(code)
     }
 
     /**
@@ -155,11 +163,12 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
      * or else the camera. The scanned code's "Open with" brings it back here. A copied code is
      * pasted on return.
      */
-    private fun scan() {
+    private fun scan(kind: RspTask.Kind = RspTask.Kind.DOWNLOAD) {
         for (intent in listOfNotNull(qrScanner(), Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))) {
             try {
                 startActivity(intent)
                 awaitingScan = true
+                scanKind = kind
                 Toast.makeText(requireContext(), R.string.scan_hint, Toast.LENGTH_LONG).show()
                 return
             } catch (e: ActivityNotFoundException) {
@@ -181,13 +190,13 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
     }
 
     /** [auto]: after the camera, quietly, and only for text that looks like a QR activation code. */
-    private fun paste(auto: Boolean) {
+    private fun paste(auto: Boolean, kind: RspTask.Kind = RspTask.Kind.DOWNLOAD) {
         val text = clipboardText()
         if (text.isNullOrBlank() || (auto && !text.trim().startsWith("LPA:", ignoreCase = true))) {
             if (!auto) Toast.makeText(requireContext(), R.string.paste_empty, Toast.LENGTH_LONG).show()
             return
         }
-        download(text)
+        if (kind == RspTask.Kind.CHECK) checkCode(text) else download(text)
     }
 
     private fun download(text: String) {
@@ -229,18 +238,21 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
             .setTitle(R.string.check_title)
             .setMessage(R.string.check_text)
             .setView(column(context, input))
-            .setPositiveButton(R.string.next) { _, _ ->
-                val text = input.text.toString().trim()
-                try {
-                    val code = if ('$' in text) ActivationCode.parse(text)
-                    else ActivationCode(Fqdn.normalise(text) ?: throw ActivationCode.Invalid(ActivationCode.Problem.ADDRESS), "", null, false)
-                    consent(code, RspTask.Kind.CHECK)
-                } catch (e: ActivationCode.Invalid) {
-                    invalid(e)
-                }
-            }
+            .setPositiveButton(R.string.next) { _, _ -> checkCode(input.text.toString()) }
+            .setNeutralButton(R.string.scan_title) { _, _ -> scan(RspTask.Kind.CHECK) }
             .setNegativeButton(android.R.string.cancel, null)
             .showSecure()
+    }
+
+    private fun checkCode(input: String) {
+        val text = input.trim()
+        try {
+            val code = if ('$' in text) ActivationCode.parse(text)
+            else ActivationCode(Fqdn.normalise(text) ?: throw ActivationCode.Invalid(ActivationCode.Problem.ADDRESS), "", null, false)
+            consent(code, RspTask.Kind.CHECK)
+        } catch (e: ActivationCode.Invalid) {
+            invalid(e)
+        }
     }
 
     /** The eUICC's root SM-DS (ES10a GetEuiccConfiguredAddresses), only when the user asks. */
@@ -574,6 +586,7 @@ class AddEsimFragment : SettingsBasePreferenceFragment(), RspTask.Listener {
 
     companion object {
         private const val STATE_SCAN = "awaiting_scan"
+        private const val STATE_SCAN_CHECK = "scan_for_check"
 
         /**
          * No screenshots or recents preview, and no other apps' overlays over the window while
